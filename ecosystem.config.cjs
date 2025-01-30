@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: 'cse-lbds-client',
-      script: 'yarn preview'
+      script: 'yarn preview -- --host'
     }
   ]
 }
