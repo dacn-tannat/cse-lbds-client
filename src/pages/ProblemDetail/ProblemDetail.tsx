@@ -15,7 +15,7 @@ export default function ProblemDetail() {
       <div className='bg-gray-50 min-h-screen'>
         <div className='container mx-auto p-10 max-w-7xl'>
           <ProblemInformation problem={problem} />
-          <CodeEditor />
+          <CodeEditor problem_id={problem.id} />
         </div>
       </div>
     )

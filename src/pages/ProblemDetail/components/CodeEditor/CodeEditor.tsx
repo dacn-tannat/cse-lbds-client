@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Editor } from '@monaco-editor/react'
 import { Moon, Sun, TypeIcon } from 'lucide-react'
 
@@ -6,16 +6,28 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { FONT_SIZE } from '@/utils/constants'
+import { submitCode } from '@/utils/apis'
 
-export default function CodeEditor() {
+export default function CodeEditor({ problem_id }: { problem_id: number }) {
   const [fontSize, setFontSize] = useState<number>(FONT_SIZE.DEFAULT)
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
-
-  console.log('theme: ', theme)
+  const editorContentRef = useRef<string>('')
 
   const handleFontSizeChange = (newSize: number) => {
     const size = Math.min(Math.max(newSize, FONT_SIZE.MIN), FONT_SIZE.MAX)
     setFontSize(size)
+  }
+
+  const handleEditorChange = (value: string | undefined) => {
+    editorContentRef.current = value || ''
+  }
+
+  const handleSubmit = () => {
+    const data = {
+      problem_id,
+      source_code: editorContentRef.current
+    }
+    submitCode(data)
   }
 
   return (
@@ -57,7 +69,7 @@ export default function CodeEditor() {
             <Editor
               height='400px'
               language='cpp'
-              // onChange={handleEditorChange}
+              onChange={handleEditorChange}
               theme={theme === 'dark' ? 'vs-dark' : 'vs-light'}
               // beforeMount={defineMonacoThemes}
               // onMount={(editor) => setEditor(editor)}
@@ -84,7 +96,10 @@ export default function CodeEditor() {
               }}
             />
           </div>
-          <Button className='mt-4 px-4 py-2 rounded-xl border-1 text-white bg-zinc-800 hover:bg-gray-200 hover:text-black transition duration-300 ease-in-out shadow'>
+          <Button
+            onClick={handleSubmit}
+            className='mt-4 px-4 py-2 rounded-xl border-1 text-white bg-zinc-800 hover:bg-gray-200 hover:text-black transition duration-300 ease-in-out shadow'
+          >
             Submit
           </Button>
         </div>

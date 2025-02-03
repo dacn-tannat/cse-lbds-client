@@ -1,7 +1,8 @@
 import axiosInstance from '@/lib/axios'
+import { Submission } from '@/types'
 // import { Problem } from '@/types'
 
-/* 
+/*
 Problem
 */
 
@@ -14,5 +15,9 @@ export const getProblemById = (id: string) => {
 }
 
 /*
-Prediction
+Submit Code
 */
+
+export const submitCode = (data: Submission) => {
+  return axiosInstance.post('/api/v1/source-code/submit', data)
+}

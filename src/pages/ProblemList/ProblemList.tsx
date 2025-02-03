@@ -32,8 +32,6 @@ export default function ProblemList() {
     queryFn: getProblems
   })
 
-  console.log(data)
-
   const navigate = useNavigate()
 
   const handleRowClick = (problem: Problem) => {

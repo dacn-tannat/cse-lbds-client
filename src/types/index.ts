@@ -12,3 +12,8 @@ export interface Problem {
   image: null
   constraints: string[]
 }
+
+export interface Submission {
+  problem_id: number
+  source_code: string
+}
