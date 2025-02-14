@@ -1,9 +1,16 @@
 import axiosInstance from '@/lib/axios'
 import { Submission } from '@/types'
-// import { Problem } from '@/types'
 
 /*
-Problem
+  Auth
+*/
+
+export const loginWithGoogle = (code: string) => {
+  return axiosInstance.post('/api/v1/auth/login/google', { code })
+}
+
+/*
+  Problem
 */
 
 export const getProblems = () => {
@@ -15,7 +22,7 @@ export const getProblemById = (id: string) => {
 }
 
 /*
-Submit Code
+  Submit Code
 */
 
 export const submitCode = (data: Submission) => {
