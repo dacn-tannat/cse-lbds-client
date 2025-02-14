@@ -5,8 +5,8 @@ import { ColumnDef } from '@tanstack/react-table'
 import { problems } from '@/mockData/problems'
 import { Problem } from '@/types'
 import { generateSlug } from '@/utils/helper'
-import { getProblems } from '@/utils/apis'
-import { useQuery } from '@tanstack/react-query'
+// import { getProblems } from '@/utils/apis'
+// import { useQuery } from '@tanstack/react-query'
 
 const columns: ColumnDef<Problem>[] = [
   {
@@ -27,18 +27,18 @@ const columns: ColumnDef<Problem>[] = [
 ]
 
 export default function ProblemList() {
-  const { data } = useQuery({
-    queryKey: ['problems'],
-    queryFn: getProblems
-  })
+  // const { data } = useQuery({
+  //   queryKey: ['problems'],
+  //   queryFn: getProblems
+  // })
 
-  console.log(data)
+  // console.log(data)
 
   const navigate = useNavigate()
 
   const handleRowClick = (problem: Problem) => {
     const slug = generateSlug(problem.name)
-    navigate(`/problems/${problem.id}?problemName=${slug}`)
+    navigate(`/problems/${slug}`)
   }
 
   return (

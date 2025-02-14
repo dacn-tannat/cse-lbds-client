@@ -3,12 +3,13 @@ import { useParams } from 'react-router-dom'
 import { problems } from '@/mockData/problems'
 import ProblemInformation from './components/ProblemInformation'
 import CodeEditor from './components/CodeEditor'
+import { generateSlug } from '@/utils/helper'
 
 export default function ProblemDetail() {
   /* Problem */
-  const { id } = useParams()
+  const { slug } = useParams()
   // temporary mock data --> fetch problem from db by id
-  const problem = problems.find((p) => p.id === parseInt(id!))
+  const problem = problems.find((p) => generateSlug(p.name) === slug)
 
   if (problem) {
     return (
