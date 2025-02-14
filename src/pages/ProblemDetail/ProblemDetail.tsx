@@ -12,8 +12,8 @@ export default function ProblemDetail() {
 
   if (problem) {
     return (
-      <div className='bg-gray-50 min-h-screen'>
-        <div className='container mx-auto p-10 max-w-7xl'>
+      <div className='bg-gray-50'>
+        <div className='max-w-7xl min-h-screen mx-auto p-8'>
           <ProblemInformation problem={problem} />
           <CodeEditor problem_id={problem.id} />
         </div>

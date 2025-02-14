@@ -42,8 +42,8 @@ export default function ProblemList() {
   }
 
   return (
-    <div className='min-h-screen bg-gray-50'>
-      <div className='container mx-auto p-10'>
+    <div className='bg-gray-50'>
+      <div className='max-w-7xl min-h-screen mx-auto p-8'>
         <div className='text-4xl font-bold mb-8 text-center'>Danh sách bài tập</div>
         <DataTable columns={columns} data={problems} onRowClick={handleRowClick} />
       </div>
