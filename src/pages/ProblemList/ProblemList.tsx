@@ -4,7 +4,7 @@ import { DataTable } from '@/components/ui/data-table'
 import { ColumnDef } from '@tanstack/react-table'
 import { problems } from '@/mockData/problems'
 import { Problem } from '@/types'
-import { generateSlug } from '@/utils/helper'
+import { generateSlug } from '@/utils/slug'
 // import { getProblems } from '@/utils/apis'
 // import { useQuery } from '@tanstack/react-query'
 

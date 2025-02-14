@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 
 import { loginWithGoogle } from '@/utils/apis'
 import { toast } from '@/hooks/use-toast'
+import { useAuthStore } from '@/store/useAuthStore'
+import { saveAccessTokenToLS } from '@/utils/auth'
 
 export default function GoogleCallback() {
   const navigate = useNavigate()
@@ -23,9 +25,11 @@ export default function GoogleCallback() {
 
       try {
         const response = await loginWithGoogle(code)
+        const { access_token, user } = response.data
 
-        const { access_token } = response.data
-        console.log(access_token)
+        saveAccessTokenToLS(access_token)
+        useAuthStore.setState({ isAuth: true })
+        useAuthStore.setState({ user })
 
         toast({
           variant: 'success',

@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom'
 import { problems } from '@/mockData/problems'
 import ProblemInformation from './components/ProblemInformation'
 import CodeEditor from './components/CodeEditor'
-import { generateSlug } from '@/utils/helper'
+import { generateSlug } from '@/utils/slug'
 
 export default function ProblemDetail() {
   /* Problem */

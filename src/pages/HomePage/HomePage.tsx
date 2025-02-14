@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 
 export default function HomePage() {
   const googleAuthUrl = generateGoogleAuthUrl()
+
   return (
     <div className='bg-gray-50'>
       <div className='max-w-7xl min-h-screen mx-auto p-8 flex flex-col items-center justify-center text-center'>
