@@ -7,8 +7,14 @@ import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { FONT_SIZE } from '@/utils/constants'
 import { submitCode } from '@/utils/apis'
+import { SubmissionResponse } from '@/types'
 
-export default function CodeEditor({ problem_id }: { problem_id: number }) {
+interface CodeEditorProps {
+  problem_id: number
+  setResponse: React.Dispatch<React.SetStateAction<SubmissionResponse | null>>
+}
+
+export default function CodeEditor({problem_id, setResponse}: CodeEditorProps) {
   const [fontSize, setFontSize] = useState<number>(FONT_SIZE.DEFAULT)
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
   const editorContentRef = useRef<string>('')
@@ -22,12 +28,15 @@ export default function CodeEditor({ problem_id }: { problem_id: number }) {
     editorContentRef.current = value || ''
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const data = {
       problem_id,
       source_code: editorContentRef.current
     }
-    submitCode(data)
+    const response = await submitCode(data)
+    if (response?.data) {
+      setResponse(response.data)
+    }
   }
 
   return (

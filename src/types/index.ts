@@ -13,6 +13,21 @@ export interface Problem {
   constraints: string[]
 }
 
+export interface SubmissionResponse {
+  source_code_id: number
+  source_code: string
+  user_id: number
+  problem_id: number
+  status: number
+  score: number
+  test_case_sample: {
+    input: string
+    output: string
+    is_correct: boolean
+  }[]
+  message: string
+}
+
 export interface Submission {
   problem_id: number
   source_code: string
