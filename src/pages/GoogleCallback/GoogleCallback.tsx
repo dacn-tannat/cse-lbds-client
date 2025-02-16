@@ -5,6 +5,7 @@ import { loginWithGoogle } from '@/utils/apis'
 import { toast } from '@/hooks/use-toast'
 import { useAuthStore } from '@/store/useAuthStore'
 import { saveAccessTokenToLS } from '@/utils/auth'
+import { Loader2 } from 'lucide-react'
 
 export default function GoogleCallback() {
   const navigate = useNavigate()
@@ -52,5 +53,14 @@ export default function GoogleCallback() {
     handleGoogleCallback()
   }, [navigate])
 
-  return <div>Đang xử lý đăng nhập...</div>
+  return (
+    <div className='max-w-7xl mx-auto p-8'>
+      <div className='min-h-screen flex flex-col items-center justify-center gap-8'>
+        <Loader2 className='size-16 animate-spin' />
+        <div className='text-gray-700 font-medium text-xl md:text-2xl lg:text-3xl italic'>
+          Google đang xử lý yêu cầu của bạn. Xin vui lòng đợi...
+        </div>
+      </div>
+    </div>
+  )
 }
