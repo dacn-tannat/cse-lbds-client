@@ -4,12 +4,15 @@ import ProblemList from './pages/ProblemList'
 import ProblemDetail from './pages/ProblemDetail'
 import Header from './components/shared/Header'
 import Footer from './components/shared/Footer'
+import GoogleCallback from './pages/GoogleCallback'
+import { Toaster } from './components/ui/toaster'
 
 function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Header />
       <main>{children}</main>
+      <Toaster />
       <Footer />
     </>
   )
@@ -37,13 +40,14 @@ function App() {
             }
           />
           <Route
-            path='/problems/:id'
+            path='/problems/:slug'
             element={
               <AppLayout>
                 <ProblemDetail />
               </AppLayout>
             }
           />
+          <Route path='/auth/google/callback' element={<GoogleCallback />} />
         </Routes>
       </BrowserRouter>
     </>

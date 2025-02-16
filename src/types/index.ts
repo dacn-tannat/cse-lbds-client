@@ -17,3 +17,13 @@ export interface Submission {
   problem_id: number
   source_code: string
 }
+
+export interface User {
+  email: string
+  email_verified: boolean
+  family_name: boolean
+  given_name: boolean
+  name: string
+  picture: string
+  sub: string // id
+}
