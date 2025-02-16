@@ -95,7 +95,7 @@ export function DataTable<TData, TValue>({ columns, data, onRowClick }: IDataTab
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className={`border-r last:border-r-0 border-gray-200`}>
+                  <TableHead key={header.id} className={`border-r last:border-r-0 border-gray-200 font-semibold`}>
                     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 ))}
