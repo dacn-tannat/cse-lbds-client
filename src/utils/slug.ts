@@ -1,5 +1,5 @@
 /* eslint-disable no-misleading-character-class */
-export const removeVietnameseAccents = (str: string) => {
+export const removeVietnameseAccents = (str: string): string => {
   // Tạo các nhóm thay thế cho từng chữ cái
   str = str.replace(/[AÁÀÃẠÂẤẦẪẬĂẮẰẴẶ]/g, 'A')
   str = str.replace(/[aàáạảãâầấậẩẫăằắặẳẵ]/g, 'a')
@@ -22,7 +22,7 @@ export const removeVietnameseAccents = (str: string) => {
   return str
 }
 
-export const generateSlug = (str: string) => {
+export const generateSlug = (str: string): string => {
   str = removeVietnameseAccents(str) // Bỏ dấu tiếng Việt
   str = str.trim().toLowerCase() // Loại bỏ khoảng trắng đầu/cuối và chuyển về chữ thường
 

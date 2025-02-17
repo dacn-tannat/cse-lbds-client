@@ -28,6 +28,8 @@ const columns: ColumnDef<Problem>[] = [
 ]
 
 export default function ProblemList() {
+  const accordionClassname =
+    'w-full text-lg font-medium bg-gray-100 px-4 py-2 rounded-xl border-[2px] hover:bg-gray-300 hover:no-underline'
   // const { data } = useQuery({
   //   queryKey: ['problems'],
   //   queryFn: getProblems
@@ -49,9 +51,7 @@ export default function ProblemList() {
         <Accordion type='multiple' className='w-full space-y-3'>
           {/* Accordion Item 1 */}
           <AccordionItem value='item-1'>
-            <AccordionTrigger className='w-full text-lg font-semibold bg-gray-200 px-6 py-3 rounded-xl shadow-sm transition-all hover:bg-blue-300 active:bg-blue-400 flex justify-between items-center'>
-              Lab 1
-            </AccordionTrigger>
+            <AccordionTrigger className={accordionClassname}>Lab 1: String, Array, Function, File I/O</AccordionTrigger>
             <AccordionContent>
               <DataTable columns={columns} data={problems} onRowClick={handleRowClick} />
             </AccordionContent>
@@ -59,9 +59,7 @@ export default function ProblemList() {
 
           {/* Accordion Item 2 */}
           <AccordionItem value='item-2'>
-            <AccordionTrigger className='w-full text-lg font-semibold bg-gray-200 px-6 py-3 rounded-xl shadow-sm transition-all hover:bg-blue-300 active:bg-blue-400 flex justify-between items-center'>
-              Lab 2
-            </AccordionTrigger>
+            <AccordionTrigger className={accordionClassname}>Lab 2: Recursion, Pointer, Struct</AccordionTrigger>
             <AccordionContent>
               <DataTable columns={columns} data={problems} onRowClick={handleRowClick} />
             </AccordionContent>
@@ -69,9 +67,7 @@ export default function ProblemList() {
 
           {/* Accordion Item 3 */}
           <AccordionItem value='item-3'>
-            <AccordionTrigger className='w-full text-lg font-semibold bg-gray-200 px-6 py-3 rounded-xl shadow-sm transition-all hover:bg-blue-300 active:bg-blue-400 flex justify-between items-center'>
-              Lab 3
-            </AccordionTrigger>
+            <AccordionTrigger className={accordionClassname}>Lab 3: Linked List, OOP</AccordionTrigger>
             <AccordionContent>
               <DataTable columns={columns} data={problems} onRowClick={handleRowClick} />
             </AccordionContent>
