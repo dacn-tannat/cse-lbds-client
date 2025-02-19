@@ -3,7 +3,6 @@ import axios, { AxiosInstance } from 'axios'
 
 class AxiosClient {
   instance: AxiosInstance
-  private access_token: string
 
   constructor() {
     this.instance = axios.create({
@@ -13,14 +12,14 @@ class AxiosClient {
         'Content-Type': 'application/json'
       }
     })
-    this.access_token = getAccessTokenFromLS()
     /* initialize access_token */
     /* request interceptors */
     this.instance.interceptors.request.use(
       (config) => {
+        const access_token = getAccessTokenFromLS()
         // Attach access_token into request header before sending
-        if (this.access_token && config.headers) {
-          config.headers.Authorization = `Bearer ${this.access_token}`
+        if (access_token && config.headers) {
+          config.headers.Authorization = `Bearer ${access_token}`
         }
         return config
       },
