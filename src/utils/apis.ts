@@ -1,24 +1,28 @@
 import axiosInstance from '@/lib/axios'
-import { Problem, Submission, SubmissionResponse } from '@/types'
+import { ApiResponse, Problem, SubmissionPayload, SubmissionResponse, User } from '@/types'
 
-/* Auth */
+/**
+ * Auth
+ */
 
 export const loginWithGoogle = (code: string) => {
-  return axiosInstance.post('/api/v1/auth/login/google', { code })
+  return axiosInstance.post<ApiResponse<{ user: User; access_token: string }>>('/api/v1/auth/login/google', {
+    code
+  })
 }
 
-/* Problem */
+/**
+ * Problem
+ */
 
-export const getProblems = () => {
-  return axiosInstance.get<Problem[]>('/api/v1/problems')
+export const getActiveProblems = () => {
+  return axiosInstance.get<ApiResponse<Problem[]>>('/api/v1/problems/active')
 }
 
-export const getProblemById = (id: string) => {
-  return axiosInstance.get<Problem>(`/api/v1/problems/${id}`)
-}
+/**
+ * Source code
+ */
 
-/* Submit Code */
-
-export const submitCode = (data: Submission) => {
-  return axiosInstance.post<SubmissionResponse>('/api/v1/source-code/submit', data)
+export const submitCode = (payload: SubmissionPayload) => {
+  return axiosInstance.post<ApiResponse<SubmissionResponse>>('/api/v1/source-code/submit', payload)
 }
