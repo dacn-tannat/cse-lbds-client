@@ -89,13 +89,13 @@ export function DataTable<TData, TValue>({ columns, data, onRowClick }: IDataTab
           </DropdownMenuContent>
         </DropdownMenu> */}
       </div>
-      <div className='rounded-md border'>
+      <div className='rounded-xl border'>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className={`border-r last:border-r-0 border-gray-200 font-semibold`}>
+                  <TableHead key={header.id} className={`border-r last:border-r-0 border-gray-200 font-semibold text-center`}>
                     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 ))}
@@ -109,7 +109,7 @@ export function DataTable<TData, TValue>({ columns, data, onRowClick }: IDataTab
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
                   onClick={() => onRowClick?.(row.original)} // Gọi hàm onRowClick với dữ liệu row
-                  className='cursor-pointer hover:bg-gray-100' // Thêm hiệu ứng hover
+                  className={`text-center ${onRowClick && 'hover:bg-gray-100 cursor-pointer'}`} // Thêm hiệu ứng hover
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
