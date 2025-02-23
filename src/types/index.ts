@@ -2,6 +2,7 @@ export interface ApiResponse<T> {
   detail: string
   data?: T
 }
+
 export interface User {
   sub: string // id
   email: string
@@ -11,6 +12,7 @@ export interface User {
   name: string
   picture: string
 }
+
 export interface Problem {
   id: number
   name: string
@@ -19,10 +21,7 @@ export interface Problem {
   is_active: boolean
   description?: string
   constrain?: string[]
-  examples?: {
-    input: string
-    output: string
-  }[]
+  examples?: TestCase[]
 }
 
 export interface SubmissionPayload {
@@ -37,12 +36,14 @@ export interface SubmissionResponse {
   problem_id: number
   status: number
   score: number
-  test_case_sample: {
-    input: string
-    output: string
-    is_correct: boolean
-  }[]
+  test_case_sample: TestCase[]
   message: string
+}
+
+export interface TestCase {
+  input: string
+  output: string
+  is_correct?: boolean
 }
 
 export interface PredictionPayload {

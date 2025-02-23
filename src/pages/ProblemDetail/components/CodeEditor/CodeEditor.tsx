@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { Editor } from '@monaco-editor/react'
 import { Moon, Sun, TypeIcon } from 'lucide-react'
 
@@ -13,12 +13,15 @@ import { useMutation } from '@tanstack/react-query'
 interface CodeEditorProps {
   problem_id: number
   setResponse: React.Dispatch<React.SetStateAction<SubmissionResponse | null>>
+  editorContentRef: React.MutableRefObject<string>
 }
 
-export default function CodeEditor({ problem_id, setResponse }: CodeEditorProps) {
+export default function CodeEditor({ problem_id, setResponse, editorContentRef }: CodeEditorProps) {
+
   const [fontSize, setFontSize] = useState<number>(FONT_SIZE.DEFAULT)
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
-  const editorContentRef = useRef<string>('')
+  // const editorContentRef = useRef<string>('')
+  
 
   const handleFontSizeChange = (newSize: number) => {
     const size = Math.min(Math.max(newSize, FONT_SIZE.MIN), FONT_SIZE.MAX)
