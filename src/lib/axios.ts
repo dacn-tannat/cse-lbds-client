@@ -18,7 +18,7 @@ class AxiosClient {
       (config) => {
         const access_token = getAccessTokenFromLS()
         // Attach access_token into request header before sending
-        if (Boolean(access_token) && config.headers) {
+        if (access_token && config.headers) {
           config.headers.Authorization = `Bearer ${access_token}`
         }
         return config

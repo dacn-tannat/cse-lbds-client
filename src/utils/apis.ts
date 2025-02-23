@@ -1,16 +1,22 @@
 import axiosInstance from '@/lib/axios'
 import { ApiResponse, BugCheckPayload, BuggyPosition, Problem, SubmissionPayload, SubmissionResponse } from '@/types'
 
-/* Auth */
+/**
+ * Auth
+ */
 
 export const loginWithGoogle = (code: string) => {
-  return axiosInstance.post('/api/v1/auth/login/google', { code })
+  return axiosInstance.post<ApiResponse<{ user: User; access_token: string }>>('/api/v1/auth/login/google', {
+    code
+  })
 }
 
-/* Problem */
+/**
+ * Problem
+ */
 
-export const getProblems = () => {
-  return axiosInstance.get('/api/v1/problems')
+export const getActiveProblems = () => {
+  return axiosInstance.get<ApiResponse<Problem[]>>('/api/v1/problems/active')
 }
 
 export const getProblemById = (id: string) => {
@@ -33,4 +39,5 @@ export const getPredictions = (source_code_id: number) => {
 
 export const submitBugCheck = (payload: BugCheckPayload) => {
   return axiosInstance.put<ApiResponse<BuggyPosition[]>>('/api/v1/prediction/bug-check', payload)
+
 }

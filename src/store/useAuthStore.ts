@@ -1,4 +1,5 @@
 import { User } from '@/types'
+import { getAccessTokenFromLS, getUserFromLS } from '@/utils/auth'
 import { create } from 'zustand'
 
 interface AuthState {
@@ -9,8 +10,8 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
-  isAuth: false,
-  user: null,
+  isAuth: Boolean(getAccessTokenFromLS()),
+  user: getUserFromLS(),
   setIsAuth: (isAuth) => set({ isAuth }),
   setUser: (user) => set({ user })
 }))

@@ -4,13 +4,13 @@ import {
   getCoreRowModel,
   useReactTable,
   // Pagination
-  getPaginationRowModel,
-  // Sorting
-  SortingState,
-  getSortedRowModel,
-  // Filtering
-  ColumnFiltersState,
-  getFilteredRowModel
+  getPaginationRowModel
+  // // Sorting
+  // SortingState,
+  // getSortedRowModel,
+  // // Filtering
+  // ColumnFiltersState,
+  // getFilteredRowModel,
   // // Visibility
   // VisibilityState
 } from '@tanstack/react-table'
@@ -18,22 +18,29 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
 import { Button } from './button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select'
-import { ChevronsLeft, ChevronsRight } from 'lucide-react'
-import { useState } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+// import { useState } from 'react'
+// import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from './dropdown-menu'
 
 interface IDataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   onRowClick?: (row: TData) => void
+  pagination?: boolean
 }
 
 const PAGINATION_OPTIONS = [3, 5, 10, 15, 20, 30, 40, 50]
 
-export function DataTable<TData, TValue>({ columns, data, onRowClick }: IDataTableProps<TData, TValue>) {
-  // For sorting
-  const [sorting, setSorting] = useState<SortingState>([])
-  // For filtering
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+export function DataTable<TData, TValue>({
+  columns,
+  data,
+  onRowClick,
+  pagination = false
+}: IDataTableProps<TData, TValue>) {
+  // // For sorting
+  // const [sorting, setSorting] = useState<SortingState>([])
+  // // For filtering
+  // const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   // // For visibility
   // const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 
@@ -42,20 +49,20 @@ export function DataTable<TData, TValue>({ columns, data, onRowClick }: IDataTab
     columns,
     getCoreRowModel: getCoreRowModel(),
     // Pagination
-    getPaginationRowModel: getPaginationRowModel(),
-    // Sorting
-    onSortingChange: setSorting,
-    getSortedRowModel: getSortedRowModel(),
-    // Filtering
-    onColumnFiltersChange: setColumnFilters,
-    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel()
+    // // Sorting
+    // onSortingChange: setSorting,
+    // getSortedRowModel: getSortedRowModel(),
+    // // Filtering
+    // onColumnFiltersChange: setColumnFilters,
+    // getFilteredRowModel: getFilteredRowModel(),
     // // Visibility
     // onColumnVisibilityChange: setColumnVisibility,
-    state: {
-      sorting,
-      columnFilters
-      // columnVisibility
-    }
+    // state: {
+    //   sorting,
+    //   columnFilters,
+    //   columnVisibility
+    // }
   })
 
   return (
@@ -127,12 +134,9 @@ export function DataTable<TData, TValue>({ columns, data, onRowClick }: IDataTab
         </Table>
       </div>
       {/* Pagination */}
-      <div className='flex items-center justify-end space-x-2 py-4'>
-        <div className='flex-1 text-sm text-muted-foreground'>
-          {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s)
-          selected.
-        </div>
-        <div className='flex items-center space-x-6 lg:space-x-8'>
+      {pagination && (
+        <div className='flex items-center justify-between space-x-6 lg:space-x-8 py-4'>
+          {/* Rows per page */}
           <div className='flex items-center space-x-2'>
             <p className='text-sm font-light'>Rows per page</p>
             <Select
@@ -141,10 +145,10 @@ export function DataTable<TData, TValue>({ columns, data, onRowClick }: IDataTab
                 table.setPageSize(Number(value))
               }}
             >
-              <SelectTrigger className='h-8 w-[70px]'>
+              <SelectTrigger className='h-8 w-[70px] border-[1px] border-gray-300 rounded-xl'>
                 <SelectValue placeholder={table.getState().pagination.pageSize} />
               </SelectTrigger>
-              <SelectContent side='top'>
+              <SelectContent side='bottom' className='bg-gray-50 rounded-xl'>
                 {PAGINATION_OPTIONS.map((pageSize) => (
                   <SelectItem key={pageSize} value={`${pageSize}`}>
                     {pageSize}
@@ -153,24 +157,31 @@ export function DataTable<TData, TValue>({ columns, data, onRowClick }: IDataTab
               </SelectContent>
             </Select>
           </div>
-          <div className='flex w-[100px] items-center justify-center text-sm font-light'>
-            Page {table.getState().pagination.pageIndex + 1} / {table.getPageCount()}
-          </div>
-          <div className='flex flex-row items-center space-x-2'>
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              <ChevronsLeft />
-            </Button>
-            <Button variant='outline' size='sm' onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
-              <ChevronsRight />
-            </Button>
+          <div className='flex space-x-2 justify-end'>
+            <div className='flex w-[100px] items-center justify-center text-sm font-light'>
+              Page {table.getState().pagination.pageIndex + 1} / {table.getPageCount()}
+            </div>
+            <div className='flex flex-row items-center space-x-1'>
+              <Button
+                className='border-[1px] border-gray-400'
+                size='sm'
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+              >
+                <ChevronLeft />
+              </Button>
+              <Button
+                className='border-[1px] border-gray-400'
+                size='sm'
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+              >
+                <ChevronRight />
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

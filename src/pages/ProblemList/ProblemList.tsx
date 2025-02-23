@@ -4,7 +4,6 @@ import { DataTable } from '@/components/ui/data-table'
 import { ColumnDef } from '@tanstack/react-table'
 import { problems } from '@/mockData/problems'
 import { Problem } from '@/types'
-import { ChevronDown } from 'lucide-react'
 import { generateSlug } from '@/utils/slug'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 // import { getProblems } from '@/utils/apis'
@@ -29,6 +28,8 @@ const columns: ColumnDef<Problem>[] = [
 ]
 
 export default function ProblemList() {
+  const accordionClassname =
+    'w-full text-lg font-medium bg-gray-100 px-4 py-2 rounded-xl border-[2px] hover:bg-gray-300 hover:no-underline'
   // const { data } = useQuery({
   //   queryKey: ['problems'],
   //   queryFn: getProblems
@@ -47,40 +48,31 @@ export default function ProblemList() {
     <div className='bg-gray-50'>
       <div className='max-w-7xl mx-auto p-8 min-h-screen'>
         <div className='text-4xl font-bold mb-8 text-center'>Kỹ thuật lập trình</div>
-        <Accordion type="multiple" className="w-full space-y-3">
-        {/* Accordion Item 1 */}
-        <AccordionItem value="item-1">
-          <AccordionTrigger className='w-full text-lg font-semibold bg-gray-200 px-6 py-3 rounded-xl shadow-sm transition-all hover:bg-blue-300 active:bg-blue-400 flex justify-between items-center'>
-            Lab 1
-            <ChevronDown />
-          </AccordionTrigger>
-          <AccordionContent>
-          <DataTable columns={columns} data={problems} onRowClick={handleRowClick} />
-          </AccordionContent>
-        </AccordionItem>
+        <Accordion type='multiple' className='w-full space-y-3'>
+          {/* Accordion Item 1 */}
+          <AccordionItem value='item-1'>
+            <AccordionTrigger className={accordionClassname}>Lab 1: String, Array, Function, File I/O</AccordionTrigger>
+            <AccordionContent>
+              <DataTable columns={columns} data={problems} onRowClick={handleRowClick} />
+            </AccordionContent>
+          </AccordionItem>
 
-        {/* Accordion Item 2 */}
-        <AccordionItem value="item-2">
-          <AccordionTrigger className='w-full text-lg font-semibold bg-gray-200 px-6 py-3 rounded-xl shadow-sm transition-all hover:bg-blue-300 active:bg-blue-400 flex justify-between items-center'>
-            Lab 2
-            <ChevronDown />
-          </AccordionTrigger>
-          <AccordionContent>
-          <DataTable columns={columns} data={problems} onRowClick={handleRowClick} />
-          </AccordionContent>
-        </AccordionItem>
+          {/* Accordion Item 2 */}
+          <AccordionItem value='item-2'>
+            <AccordionTrigger className={accordionClassname}>Lab 2: Recursion, Pointer, Struct</AccordionTrigger>
+            <AccordionContent>
+              <DataTable columns={columns} data={problems} onRowClick={handleRowClick} />
+            </AccordionContent>
+          </AccordionItem>
 
-        {/* Accordion Item 3 */}
-        <AccordionItem value="item-3">
-          <AccordionTrigger className='w-full text-lg font-semibold bg-gray-200 px-6 py-3 rounded-xl shadow-sm transition-all hover:bg-blue-300 active:bg-blue-400 flex justify-between items-center'>
-            Lab 3
-            <ChevronDown />
-          </AccordionTrigger>
-          <AccordionContent>
-          <DataTable columns={columns} data={problems} onRowClick={handleRowClick} />
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+          {/* Accordion Item 3 */}
+          <AccordionItem value='item-3'>
+            <AccordionTrigger className={accordionClassname}>Lab 3: Linked List, OOP</AccordionTrigger>
+            <AccordionContent>
+              <DataTable columns={columns} data={problems} onRowClick={handleRowClick} />
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </div>
     </div>
   )

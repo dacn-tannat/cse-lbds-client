@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { FONT_SIZE } from '@/utils/constants'
 import { submitCode } from '@/utils/apis'
-import { SubmissionResponse } from '@/types'
+import { SubmissionPayload, SubmissionResponse } from '@/types'
+import { useMutation } from '@tanstack/react-query'
 
 interface CodeEditorProps {
   problem_id: number
@@ -16,6 +17,7 @@ interface CodeEditorProps {
 }
 
 export default function CodeEditor({ problem_id, setResponse, editorContentRef }: CodeEditorProps) {
+
   const [fontSize, setFontSize] = useState<number>(FONT_SIZE.DEFAULT)
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
   // const editorContentRef = useRef<string>('')
@@ -30,15 +32,25 @@ export default function CodeEditor({ problem_id, setResponse, editorContentRef }
     editorContentRef.current = value || ''
   }
 
+  const submitMutation = useMutation({
+    mutationFn: submitCode,
+    onSuccess: (response) => {
+      if (response.data.data) {
+        setResponse(response.data.data)
+      }
+    },
+    onError: (error) => {
+      console.error('Error while submitting code:', error)
+    }
+  })
+
   const handleSubmit = async () => {
-    const data = {
-      problem_id,
+    if (!editorContentRef.current) return
+    const payload: SubmissionPayload = {
+      problem_id: problem_id,
       source_code: editorContentRef.current
     }
-    const response = await submitCode(data)
-    if (response?.data) {
-      setResponse(response.data.data!)
-    }
+    submitMutation.mutate(payload)
   }
 
   return (

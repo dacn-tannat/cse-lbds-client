@@ -22,10 +22,10 @@ export default function ProblemDetail() {
   console.log('problems: ', data)
 
   const { slug } = useParams()
-  // temporary mock data --> fetch problem from db by id
+  // temporary using mock data --> fetch problem from db by id
   const problem = problems.find((p) => generateSlug(p.name) === slug)
-
   const [response, setResponse] = useState<SubmissionResponse | null>(null)
+  
   const editorContentRef = useRef<string>('')
 
   // useMutation for making POST request to get predictions
@@ -41,9 +41,9 @@ export default function ProblemDetail() {
     }
   }, [response, mutate])
 
+
   if (problem) {
     return (
-      
       <div className='bg-gray-50'>
         {/* {response && <div>{JSON.stringify(response)}</div>} */}
         <div className='max-w-7xl min-h-screen mx-auto p-8'>

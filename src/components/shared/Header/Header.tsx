@@ -1,9 +1,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { toast } from '@/hooks/use-toast'
 import { useAuthStore } from '@/store/useAuthStore'
-import { clearAccessTokenFromLS } from '@/utils/auth'
+import { clearAccessTokenFromLS, clearUserFromLS } from '@/utils/auth'
 import { Home } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 
@@ -13,9 +12,9 @@ export default function Header() {
   const navigate = useNavigate()
 
   const handleLogout = () => {
-    useAuthStore.setState({ isAuth: false })
-    useAuthStore.setState({ user: null })
+    useAuthStore.setState({ isAuth: false, user: null })
     clearAccessTokenFromLS()
+    clearUserFromLS()
     toast({
       variant: 'success',
       title: 'Thành công',
@@ -37,17 +36,16 @@ export default function Header() {
         </div>
         {isAuth && user && (
           <DropdownMenu>
-            <DropdownMenuTrigger>
+            <DropdownMenuTrigger className='cursor-pointer'>
               <Avatar>
                 <AvatarImage src={user.picture} />
                 <AvatarFallback>{user.name[0]}</AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem>
-                <Button variant='link' onClick={handleLogout}>
-                  Đăng xuất
-                </Button>
+            <DropdownMenuContent align='end' className='w-40 bg-slate-50 rounded-xl shadow-lg'>
+              <DropdownMenuItem className='p-2 cursor-pointer border-b-[1px]'>Lịch sử nộp bài</DropdownMenuItem>
+              <DropdownMenuItem className='p-2 cursor-pointer' onClick={handleLogout}>
+                Đăng xuất
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

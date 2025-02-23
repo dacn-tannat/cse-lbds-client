@@ -32,7 +32,7 @@ export interface SubmissionPayload {
 export interface SubmissionResponse {
   source_code_id: number
   source_code: string
-  user_id: number
+  user_id: string
   problem_id: number
   status: number
   score: number
