@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { toast } from '@/hooks/use-toast'
 import { useAuthStore } from '@/store/useAuthStore'
-import { clearAccessTokenFromLS, clearUserFromLS } from '@/utils/auth'
+import { logout } from '@/utils/auth'
 import { Home } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 
@@ -12,9 +12,7 @@ export default function Header() {
   const navigate = useNavigate()
 
   const handleLogout = () => {
-    useAuthStore.setState({ isAuth: false, user: null })
-    clearAccessTokenFromLS()
-    clearUserFromLS()
+    logout()
     toast({
       variant: 'success',
       title: 'Thành công',

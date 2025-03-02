@@ -3,8 +3,6 @@ import { useNavigate } from 'react-router-dom'
 
 import { loginWithGoogle } from '@/utils/apis'
 import { toast } from '@/hooks/use-toast'
-import { useAuthStore } from '@/store/useAuthStore'
-import { saveAccessTokenToLS, saveUserToLS } from '@/utils/auth'
 import { Loader2 } from 'lucide-react'
 import { useMutation } from '@tanstack/react-query'
 
@@ -12,32 +10,21 @@ export default function GoogleCallback() {
   const navigate = useNavigate()
 
   const loginWithGoogleMutation = useMutation({
-    mutationFn: (code: string) => loginWithGoogle(code),
-    onSuccess: (response) => {
-      const { access_token, user } = response.data.data ?? {}
-
-      if (access_token && user) {
-        saveAccessTokenToLS(access_token)
-        saveUserToLS(user)
-
-        useAuthStore.setState({ isAuth: true, user })
-
-        toast({
-          variant: 'success',
-          title: 'Thành công',
-          description: response.data.detail || 'Đăng nhập thành công'
-        })
-
-        navigate('/problems')
-      }
+    mutationFn: loginWithGoogle,
+    onSuccess: () => {
+      toast({
+        variant: 'success',
+        title: 'Thành công',
+        description: 'Đăng nhập thành công'
+      })
+      navigate('/problems')
     },
-    onError: (error) => {
+    onError: () => {
       toast({
         variant: 'destructive',
         title: 'Lỗi',
-        description: error.message || 'Có lỗi xảy ra trong quá trình đăng nhập'
+        description: 'Có lỗi xảy ra trong quá trình đăng nhập. Vui lòng thử lại'
       })
-
       navigate('/')
     }
   })
@@ -60,7 +47,7 @@ export default function GoogleCallback() {
     }
 
     handleGoogleCallback()
-  }, [])
+  }, [navigate])
 
   return (
     <div className='max-w-7xl mx-auto p-8'>

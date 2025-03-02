@@ -1,57 +1,8 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import HomePage from './pages/HomePage'
-import ProblemList from './pages/ProblemList'
-import ProblemDetail from './pages/ProblemDetail'
-import Header from './components/shared/Header'
-import Footer from './components/shared/Footer'
-import GoogleCallback from './pages/GoogleCallback'
-import { Toaster } from './components/ui/toaster'
-
-function AppLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <>
-      <Header />
-      <main>{children}</main>
-      <Toaster />
-      <Footer />
-    </>
-  )
-}
+import useAppRoutes from './hooks/useAppRoutes'
 
 function App() {
-  return (
-    <>
-      <BrowserRouter>
-        <Routes>
-          <Route
-            path='/'
-            element={
-              <AppLayout>
-                <HomePage />
-              </AppLayout>
-            }
-          />
-          <Route
-            path='/problems'
-            element={
-              <AppLayout>
-                <ProblemList />
-              </AppLayout>
-            }
-          />
-          <Route
-            path='/problems/:slug'
-            element={
-              <AppLayout>
-                <ProblemDetail />
-              </AppLayout>
-            }
-          />
-          <Route path='/auth/google/callback' element={<GoogleCallback />} />
-        </Routes>
-      </BrowserRouter>
-    </>
-  )
+  const appRoutes = useAppRoutes()
+  return <>{appRoutes}</>
 }
 
 export default App

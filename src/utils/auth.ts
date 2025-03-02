@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/store/useAuthStore'
 import { User } from '@/types'
 
 /* OAuth Login Google */
@@ -12,6 +13,13 @@ export const generateGoogleAuthUrl = (): string => {
     prompt: 'consent'
   }
   return `https://accounts.google.com/o/oauth2/auth?${new URLSearchParams(query).toString()}`
+}
+
+/* Logout */
+export const logout = () => {
+  clearAccessTokenFromLS()
+  clearUserFromLS()
+  useAuthStore.setState({ isAuth: false, user: null })
 }
 
 /* Local Storage */

@@ -1,5 +1,4 @@
-import { PredictionPayload } from './../types/index'
-import axiosInstance from '@/lib/axios'
+import axiosInstance from '@/utils/axios'
 import {
   ApiResponse,
   BugCheckPayload,

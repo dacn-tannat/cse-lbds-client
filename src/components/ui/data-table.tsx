@@ -102,7 +102,10 @@ export function DataTable<TData, TValue>({
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className={`border-r last:border-r-0 border-gray-200 font-semibold text-center`}>
+                  <TableHead
+                    key={header.id}
+                    className={`text-lg border-r last:border-r-0 border-gray-200 font-semibold text-center`}
+                  >
                     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 ))}
@@ -116,7 +119,7 @@ export function DataTable<TData, TValue>({
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
                   onClick={() => onRowClick?.(row.original)} // Gọi hàm onRowClick với dữ liệu row
-                  className={`text-center ${onRowClick && 'hover:bg-gray-100 cursor-pointer'}`} // Thêm hiệu ứng hover
+                  className={`text-lg text-center ${onRowClick && 'hover:bg-gray-100 cursor-pointer'}`} // Thêm hiệu ứng hover
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
@@ -138,7 +141,7 @@ export function DataTable<TData, TValue>({
         <div className='flex items-center justify-between space-x-6 lg:space-x-8 py-4'>
           {/* Rows per page */}
           <div className='flex items-center space-x-2'>
-            <p className='text-sm font-light'>Rows per page</p>
+            <p className='text-base font-light'>Rows per page</p>
             <Select
               value={`${table.getState().pagination.pageSize}`}
               onValueChange={(value) => {

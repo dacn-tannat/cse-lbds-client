@@ -1,10 +1,20 @@
 import { Button } from '@/components/ui/button'
+import { toast } from '@/hooks/use-toast'
 import { useAuthStore } from '@/store/useAuthStore'
 import { generateGoogleAuthUrl } from '@/utils/auth'
 import { ChevronRightIcon } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 
 export default function HomePage() {
+  const [searchParams] = useSearchParams()
+  if (searchParams.get('reason') === 'login_required') {
+    toast({
+      variant: 'destructive',
+      title: 'Thông báo',
+      description: 'Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại'
+    })
+  }
+
   const isAuth = useAuthStore((state) => state.isAuth)
   const user = useAuthStore((state) => state.user)
 
