@@ -19,6 +19,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Button } from './button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useMemo } from 'react'
 // import { useState } from 'react'
 // import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from './dropdown-menu'
 
@@ -44,12 +45,18 @@ export function DataTable<TData, TValue>({
   // // For visibility
   // const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 
+  /* Custom tableState */
+  const tableState = useMemo(() => {
+    return pagination ? {} : { pagination: { pageIndex: 0, pageSize: data.length } }
+  }, [pagination, data.length])
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    // Pagination
-    getPaginationRowModel: getPaginationRowModel()
+    // Pagination: only paginate when pagination == true
+    ...(pagination ? { getPaginationRowModel: getPaginationRowModel() } : {}),
+    state: tableState
     // // Sorting
     // onSortingChange: setSorting,
     // getSortedRowModel: getSortedRowModel(),

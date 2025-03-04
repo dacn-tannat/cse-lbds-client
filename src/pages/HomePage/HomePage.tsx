@@ -7,7 +7,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 
 export default function HomePage() {
   const [searchParams] = useSearchParams()
-  if (searchParams.get('reason') === 'login_required') {
+  if (searchParams.get('reason') === 'session_expired') {
     toast({
       variant: 'destructive',
       title: 'Thông báo',
@@ -31,7 +31,7 @@ export default function HomePage() {
         </div>
         {isAuth && user ? (
           <div>
-            <Link to='/problems' className='flex gap-2 items-center justify-center text-blue-700 hover:underline'>
+            <Link to='/problems' className='flex gap-2 items-center justify-center text-blue-500 hover:underline'>
               <ChevronRightIcon className='size-6' />
               <div className='italic text-sm sm:text-base md:text-lg lg:text-xl'>Danh sách bài tập</div>
             </Link>

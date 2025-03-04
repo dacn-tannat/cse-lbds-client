@@ -11,7 +11,7 @@ class AxiosClient {
   constructor() {
     this.instance = axios.create({
       baseURL: import.meta.env.VITE_API_URL,
-      timeout: 5000, // 5s
+      timeout: 5 * 60 * 1000, // 5 mins
       headers: {
         'Content-Type': 'application/json'
       }
@@ -24,7 +24,6 @@ class AxiosClient {
      */
     this.instance.interceptors.request.use(
       (config) => {
-        console.log('this.access token = ', this.accessToken)
         // Attach access token into request header before sending
         if (this.accessToken && config.headers) {
           config.headers.Authorization = `Bearer ${this.accessToken}`
@@ -57,7 +56,7 @@ class AxiosClient {
           this.accessToken = ''
           this.user = null
           logout()
-          location.href = '/?reason=login_required'
+          location.href = '/?reason=session_expired'
         }
         return Promise.reject(error)
       }

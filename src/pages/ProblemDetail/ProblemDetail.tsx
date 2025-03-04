@@ -1,80 +1,95 @@
-import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useMutation, useQuery } from '@tanstack/react-query'
 
-import { problems } from '@/mockData/problems'
 import ProblemInformation from './components/ProblemInformation'
 import CodeEditor from './components/CodeEditor'
-import { generateSlug } from '@/utils/slug'
-import { PredictionResponse, SubmissionResponse } from '@/types'
+import { getPredictions, getProblemById } from '@/utils/apis'
+import { getIdFromSlug } from '@/utils/slug'
+import { useProblemDetailStore } from '@/store/useProblemDetailStore'
 import ErrorMessage from './components/ErrorMessage'
-import { getActiveProblems, getPredictions } from '@/utils/apis'
 import TestCaseTable from './components/TestCaseTable'
-import Prediction from './components/Prediction'
+import { toast } from '@/hooks/use-toast'
+import { useEffect } from 'react'
+import { SUBMISSION_MESSAGE } from '@/utils/constants'
+import PredictionResult from './components/PredictionResult/PredictionResult'
 
 export default function ProblemDetail() {
-  const { data } = useQuery({
-    queryKey: ['problems'],
-    queryFn: getActiveProblems
-  })
-  console.log('problems: ', data)
-
   const { slug } = useParams()
-  // temporary using mock data --> fetch problem from db by id
-  const problem = problems.find((p) => generateSlug(p.name) === slug)
-  const [response, setResponse] = useState<SubmissionResponse | null>(null)
-  const [prediction, setPrediction] = useState<PredictionResponse | null>(null)
+  const id = getIdFromSlug(slug as string)
 
-  const editorContentRef = useRef<string>('')
+  // Problem Detail Store
+  const submission = useProblemDetailStore((state) => state.submission)
+  const prediction = useProblemDetailStore((state) => state.prediction)
+  const setPrediction = useProblemDetailStore((state) => state.setPrediction)
+  const setIsPredicting = useProblemDetailStore((state) => state.setIsPredicting)
+  const resetState = useProblemDetailStore((state) => state.resetState)
 
-  // useMutation for making POST request to get predictions
-  const predictionMutation = useMutation({
-    mutationFn: (source_code_id: number) => getPredictions(source_code_id),
-    onSuccess: (response) => {
-      if (response.data.data) {
-        setPrediction(response.data.data)
-      }
-    },
-    onError: (error) => console.error('Prediction error:', error)
+  const { data: problemData } = useQuery({
+    queryKey: ['problems', id],
+    queryFn: ({ queryKey }) => getProblemById(queryKey[1]),
+    enabled: Boolean(id),
+    staleTime: Infinity
   })
 
-  // Trigger mutation when response is valid
-  useEffect(() => {
-    if (response && response.message === 'Accepted' && response.status !== 4) {
-      predictionMutation.mutate(response.source_code_id)
-    }
-  }, [response, predictionMutation.mutate])
+  const problem = problemData?.data.data
 
-  if (problem) {
-    return (
-      <div className='bg-gray-50'>
-        {/* {response && <div>{JSON.stringify(response)}</div>} */}
-        <div className='max-w-7xl min-h-screen mx-auto p-8'>
-          <ProblemInformation problem={problem} />
-          <CodeEditor problem_id={problem.id} setResponse={setResponse} editorContentRef={editorContentRef} />
-          {response && response.message !== 'Accepted' && (
-            <ErrorMessage message={response.message} status={response.status} />
-          )}
-          {response && response.message === 'Accepted' && (
-            <TestCaseTable
-              source_code_id={response.source_code_id}
-              testcase={response.test_case_sample}
-              score={response.score}
-              status={response.status}
-            />
-          )}
-          {response && response.message === 'Accepted' && response.status !== 4 && (
-            <>
-              {' '}
-              {predictionMutation.isPending ? (
-                <p>Loading predictions...</p>
+  const predictMutation = useMutation({
+    mutationFn: getPredictions,
+    onSuccess: (response) => {
+      setIsPredicting(false)
+      setPrediction(response.data.data)
+    },
+    onError: (error) => {
+      toast({
+        variant: 'destructive',
+        title: 'Có lỗi xảy ra trong quá trình dự đoán',
+        description: error.message
+      })
+      setIsPredicting(false)
+      setPrediction(undefined)
+    }
+  })
+
+  // get prediction in case submission status === 1
+  useEffect(() => {
+    if (submission && submission.source_code_id && submission.status === 1) {
+      setPrediction(undefined)
+      setIsPredicting(true)
+      predictMutation.mutate(submission?.source_code_id)
+    }
+  }, [submission?.source_code_id])
+
+  // reset state when exit page
+  useEffect(() => {
+    return () => {
+      resetState()
+    }
+  }, [resetState])
+
+  return (
+    <div className='bg-gray-50'>
+      <div className='max-w-7xl min-h-screen mx-auto p-8'>
+        {problem && (
+          <div>
+            <div className='text-2xl font-bold mb-6'>{`[${problem.lab_id}_${problem.category}] ${problem.name}`}</div>
+            <ProblemInformation problem={problem} />
+            <CodeEditor problem_id={problem.id} />
+            {submission &&
+              (submission.message !== SUBMISSION_MESSAGE.ACCEPTED_RESPONSE ? (
+                <ErrorMessage message={submission.message} status={submission.status} />
               ) : (
-                prediction && <Prediction predictions={prediction} source_code={editorContentRef.current} />
-              )}
-            </>
-          )}
-        </div>
+                <TestCaseTable
+                  score={submission.score}
+                  status={submission.status}
+                  testcases={submission.test_case_sample}
+                />
+              ))}
+            {prediction && (
+              <PredictionResult buggyPositions={prediction.buggy_position} source_code={submission?.source_code!} />
+            )}
+          </div>
+        )}
       </div>
-    )
-  }
+    </div>
+  )
 }

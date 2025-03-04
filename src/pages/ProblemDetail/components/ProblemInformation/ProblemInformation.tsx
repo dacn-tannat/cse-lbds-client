@@ -1,60 +1,47 @@
 import DOMPurify from 'dompurify'
+import { memo } from 'react'
 
 import { Problem } from '@/types'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
-export default function ProblemInformation({ problem }: { problem: Problem }) {
+const ProblemInformation = ({ problem }: { problem: Problem }) => {
+  console.log('>>> PROBLEM INFORMATION')
   return (
-    <>
-      <div className='text-2xl font-bold mb-6'>{problem.name}</div>
-      <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-        <div className='md:col-span-2'>
-          <div className='bg-gray-100 shadow rounded-xl p-6 border-2'>
-            <div className='text-xl font-semibold mb-4'>Mô tả</div>
-            <div
-              className='text-gray-800 mb-4'
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(problem.description!) }}
-            />
-            {problem.examples!.map((example, index) => (
-              <div key={index} className='bg-[#efefef] p-4 rounded-xl mb-4'>
-                <div className='font-bold mb-2 text-lg'>Ví dụ {index + 1}:</div>
-                <div className='border-l-4 border-gray-300'>
-                  <div className='px-4 pt-1'>
-                    <p className='mb-2'>
-                      <strong>Input:</strong>{' '}
-                      <span
-                        className='text-gray-800 mb-4'
-                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(example.input) }}
-                      />
-                    </p>
-                    <p className='mb-2'>
-                      <strong>Output:</strong>{' '}
-                      <span
-                        className='text-gray-800 mb-4'
-                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(example.output) }}
-                      />
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className='md:col-span-1'>
-          <div className='bg-gray-100 shadow rounded-xl p-6 border-2'>
-            <div className='text-xl font-semibold mb-2'>Ràng buộc</div>
-            <ul className='list-disc list-inside text-gray-700 '>
-              {problem.constrain!.map((constraint, index) => (
-                <li key={index}>
-                  <span
-                    className='text-gray-800 mb-4'
-                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(constraint) }}
-                  />
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </div>
-    </>
+    <div className='bg-gray-100 shadow rounded-xl p-6 border-2'>
+      <div className='text-xl font-semibold mb-2'>Mô tả:</div>
+      <div
+        className='text-gray-800 mb-4'
+        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(problem.description!) }}
+      />
+      <div className='text-xl font-semibold mb-2'>Ví dụ:</div>
+      <Table className='border-collapse'>
+        <TableHeader>
+          <TableRow>
+            <TableHead className='border-2 border-gray-300 font-semibold text-lg bg-gray-200'>Test</TableHead>
+            <TableHead className='border-2 border-gray-300 font-semibold text-lg bg-gray-200'>Result</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {problem.examples!.map((example, index) => {
+            return (
+              <TableRow key={index}>
+                <TableCell
+                  className={`${index % 2 ? 'bg-white' : ''} border-2 border-gray-300 font-mono whitespace-pre-wrap`}
+                >
+                  {example.input || example.testcode}
+                </TableCell>
+                <TableCell
+                  className={`${index % 2 ? 'bg-white' : ''} border-2 border-gray-300 font-mono whitespace-pre-wrap`}
+                >
+                  {example.output}
+                </TableCell>
+              </TableRow>
+            )
+          })}
+        </TableBody>
+      </Table>
+    </div>
   )
 }
+
+export default memo(ProblemInformation)

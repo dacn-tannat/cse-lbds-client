@@ -2,18 +2,18 @@ import { useNavigate } from 'react-router-dom'
 
 import { DataTable } from '@/components/ui/data-table'
 import { ColumnDef } from '@tanstack/react-table'
-import { problems } from '@/mockData/problems'
 import { Problem } from '@/types'
 import { generateSlug } from '@/utils/slug'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
-// import { getProblems } from '@/utils/apis'
-// import { useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
+import { getActiveProblems } from '@/utils/apis'
 
 const columns: ColumnDef<Problem>[] = [
   {
     id: 'id',
     accessorKey: 'id',
-    header: '#'
+    header: '#',
+    cell: ({ row }) => row.index + 1
   },
   {
     id: 'name',
@@ -28,19 +28,29 @@ const columns: ColumnDef<Problem>[] = [
 ]
 
 export default function ProblemList() {
-  const accordionClassname =
-    'w-full text-lg font-medium bg-gray-100 px-4 py-2 rounded-xl border-[2px] hover:bg-gray-300 hover:no-underline'
-  // const { data } = useQuery({
-  //   queryKey: ['problems'],
-  //   queryFn: getProblems
-  // })
-
-  // console.log(data)
-
   const navigate = useNavigate()
 
+  const { data, isSuccess } = useQuery({
+    queryKey: ['problems'],
+    queryFn: getActiveProblems,
+    staleTime: Infinity
+  })
+
+  const problems =
+    isSuccess &&
+    (data?.data.data as Problem[])
+      .filter((problem) => problem.is_active)
+      .sort((a, b) => a.id - b.id)
+      .reduce((acc, problem) => {
+        if (!acc[problem.lab_id]) {
+          acc[problem.lab_id] = []
+        }
+        acc[problem.lab_id].push(problem)
+        return acc
+      }, {} as Record<string, Problem[]>)
+
   const handleRowClick = (problem: Problem) => {
-    const slug = generateSlug(problem.name)
+    const slug = generateSlug(problem.name, problem.id)
     navigate(`/problems/${slug}`)
   }
 
@@ -48,31 +58,19 @@ export default function ProblemList() {
     <div className='bg-gray-50'>
       <div className='max-w-7xl mx-auto p-8 min-h-screen'>
         <div className='text-4xl font-bold mb-8 text-center'>Kỹ thuật lập trình</div>
-        <Accordion type='multiple' className='w-full space-y-3'>
-          {/* Accordion Item 1 */}
-          <AccordionItem value='item-1'>
-            <AccordionTrigger className={accordionClassname}>Lab 1: String, Array, Function, File I/O</AccordionTrigger>
-            <AccordionContent>
-              <DataTable columns={columns} data={problems} onRowClick={handleRowClick} />
-            </AccordionContent>
-          </AccordionItem>
-
-          {/* Accordion Item 2 */}
-          <AccordionItem value='item-2'>
-            <AccordionTrigger className={accordionClassname}>Lab 2: Recursion, Pointer, Struct</AccordionTrigger>
-            <AccordionContent>
-              <DataTable columns={columns} data={problems} onRowClick={handleRowClick} />
-            </AccordionContent>
-          </AccordionItem>
-
-          {/* Accordion Item 3 */}
-          <AccordionItem value='item-3'>
-            <AccordionTrigger className={accordionClassname}>Lab 3: Linked List, OOP</AccordionTrigger>
-            <AccordionContent>
-              <DataTable columns={columns} data={problems} onRowClick={handleRowClick} />
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
+        {problems &&
+          Object.entries(problems).map(([lab, problems]) => (
+            <Accordion type='multiple' className='w-full'>
+              <AccordionItem value={`${lab}`} className='mb-3'>
+                <AccordionTrigger className='h-[3.5rem] w-full text-xl font-medium bg-gray-100 px-4 py-2 rounded-xl border-[2px] hover:bg-gray-300 hover:no-underline'>
+                  {lab}
+                </AccordionTrigger>
+                <AccordionContent>
+                  <DataTable columns={columns} data={problems} onRowClick={handleRowClick} />
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          ))}
       </div>
     </div>
   )
