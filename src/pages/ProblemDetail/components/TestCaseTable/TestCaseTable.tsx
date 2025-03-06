@@ -53,7 +53,7 @@ const TestCaseTable = ({ testcases, score, status }: TestCaseProps) => {
             </TableBody>
           </Table>
           <div className='mt-2 text-lg'>
-            <span className='font-semibold text-gray-500'>{STATUS_TITLE_MAPPING[status]}</span>
+            <span className='font-medium text-gray-600'>{STATUS_TITLE_MAPPING[status]}</span>
           </div>
         </div>
       </div>

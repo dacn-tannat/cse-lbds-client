@@ -1,5 +1,13 @@
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { memo, useState } from 'react'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog'
+import { memo, useRef } from 'react'
 import DOMPurify from 'dompurify'
 import { BugCheckRequest, BugCheckTypeValue, PredictionLS } from '@/types'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -13,21 +21,21 @@ import { bugCheck } from '@/utils/apis'
 import { toast } from '@/hooks/use-toast'
 
 interface FeedbackModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
   lastPrediction: PredictionLS | null
+  onSubmittedFeedback: () => void
 }
 
-const FeedbackModal = ({ open, onOpenChange, lastPrediction }: FeedbackModalProps) => {
+const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalProps) => {
   if (!lastPrediction) {
-    clearPredictionFromLS()
-    onOpenChange(false)
     return null
   }
 
   const { predictionId, buggyPositions, sourceCode } = lastPrediction
 
-  const [selectedCheckboxes, setSelectedCheckboxes] = useState<{
+  // close modal by clicking DialogClose button
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
+
+  const selectedCheckboxesRef = useRef<{
     TOKEN_ERROR: number[]
     SUGGESTION_USEFUL: number[]
   }>({
@@ -36,26 +44,23 @@ const FeedbackModal = ({ open, onOpenChange, lastPrediction }: FeedbackModalProp
   })
 
   const handleCheckboxChange = (bugId: number, column: BugCheckTypeValue, checked: boolean) => {
-    setSelectedCheckboxes((prev) => {
-      return {
-        ...prev,
-        [column]: checked
-          ? [...prev[column], bugId] // if checked, append bugId
-          : prev[column].filter((_bugId) => _bugId !== bugId) // if unchecked, remove bugId
-      }
-    })
+    if (checked) {
+      selectedCheckboxesRef.current[column] = [...selectedCheckboxesRef.current[column], bugId]
+    } else {
+      selectedCheckboxesRef.current[column] = selectedCheckboxesRef.current[column].filter((_bugId) => _bugId !== bugId)
+    }
   }
-
   const bugCheckMutation = useMutation({
     mutationFn: (payloads: BugCheckRequest[]) => Promise.all(payloads.map(bugCheck)),
     onSuccess: () => {
       toast({
         variant: 'success',
-        title: 'Thành công',
-        description: 'Đã gửi phản hồi thành công. Bạn có thể tiếp tục nộp bài'
+        title: 'Gửi phản hồi thành công',
+        description: 'Bạn có thể tiếp tục nộp bài'
       })
       clearPredictionFromLS()
-      onOpenChange(false)
+      closeButtonRef.current?.click()
+      onSubmittedFeedback()
     },
     onError: (error) => {
       toast({
@@ -69,32 +74,47 @@ const FeedbackModal = ({ open, onOpenChange, lastPrediction }: FeedbackModalProp
   const handleSubmitFeedback = () => {
     const payloads: BugCheckRequest[] = []
 
-    if (selectedCheckboxes.TOKEN_ERROR.length > 0) {
+    const { TOKEN_ERROR, SUGGESTION_USEFUL } = selectedCheckboxesRef.current
+
+    if (TOKEN_ERROR.length === 0 && SUGGESTION_USEFUL.length === 0) {
+      toast({
+        variant: 'destructive',
+        title: 'Lỗi',
+        description: 'Bạn cần tick vào ít nhất 1 gợi ý/ký tự lỗi'
+      })
+      return
+    }
+
+    if (TOKEN_ERROR.length > 0) {
       payloads.push({
         prediction_id: predictionId,
         type: BUG_CHECK_TYPE.TOKEN_ERROR,
-        position: selectedCheckboxes.TOKEN_ERROR
+        position: TOKEN_ERROR
       })
     }
 
-    if (selectedCheckboxes.SUGGESTION_USEFUL.length > 0) {
+    if (SUGGESTION_USEFUL.length > 0) {
       payloads.push({
         prediction_id: predictionId,
         type: BUG_CHECK_TYPE.SUGGESTION_USEFUL,
-        position: selectedCheckboxes.SUGGESTION_USEFUL
+        position: SUGGESTION_USEFUL
       })
     }
-
-    if (payloads.length === 0) return
 
     bugCheckMutation.mutate(payloads)
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    // <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button className='text-base px-8 py-4 rounded-xl text-white bg-yellow-500 hover:bg-yellow-500/80 w-full sm:w-fit'>
+          Send Feedback
+        </Button>
+      </DialogTrigger>
       <DialogContent className='w-3/4 max-w-[100vw] max-h-[80vh] bg-white overflow-auto'>
         <DialogHeader>
-          <DialogTitle className='text-2xl'>Submit Feedback </DialogTitle>
+          <DialogTitle className='text-2xl'>Submit Feedback</DialogTitle>
           <DialogDescription>
             <span className='mb-2 italic text-gray-500 block'>Vui lòng phản hồi trước khi nộp bài mới.</span>
             <span>
@@ -191,12 +211,23 @@ const FeedbackModal = ({ open, onOpenChange, lastPrediction }: FeedbackModalProp
               <div className='text-yellow-700 italic text-sm'>
                 [**] Đánh dấu những <span className='font-bold'>gợi ý</span> bạn đã sử dụng để sửa lỗi
               </div>
-              <Button
-                onClick={handleSubmitFeedback}
-                className='px-6 py-3 rounded-xl text-white bg-zinc-800 hover:bg-zinc-800/80'
-              >
-                Submit feedback
-              </Button>
+              <div className='flex flex-wrap justify-end items-center gap-2'>
+                <Button
+                  onClick={handleSubmitFeedback}
+                  className='w-full sm:w-auto px-6 py-3 rounded-xl text-white bg-yellow-500 hover:bg-yellow-500/80 text-base'
+                >
+                  Send feedback
+                </Button>
+                <DialogClose asChild>
+                  <Button
+                    ref={closeButtonRef}
+                    type='button'
+                    className='w-full sm:w-auto px-6 py-3 rounded-xl bg-gray-200 text-black text-base'
+                  >
+                    Close
+                  </Button>
+                </DialogClose>
+              </div>
             </div>
           </div>
         </div>

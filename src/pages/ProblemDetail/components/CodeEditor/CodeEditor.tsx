@@ -1,7 +1,8 @@
 import { memo, useRef, useState } from 'react'
 import { Editor } from '@monaco-editor/react'
-import { Loader2, Moon, Sun, TypeIcon } from 'lucide-react'
+import { AlertCircle, Loader2, Moon, Sun, TypeIcon } from 'lucide-react'
 
+import FeedbackModal from '../FeedbackModal'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
@@ -12,7 +13,7 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from '@/hooks/use-toast'
 import { useProblemDetailStore } from '@/store/useProblemDetailStore'
 import { getPredictionFromLS } from '@/utils/local-storage'
-import FeedbackModal from '../FeedbackModal'
+import { Alert, AlertTitle } from '@/components/ui/alert'
 
 interface CodeEditorProps {
   problem_id: number
@@ -24,8 +25,11 @@ const CodeEditor = ({ problem_id }: CodeEditorProps) => {
 
   const editorContentRef = useRef<string>('')
 
-  const [openFeedbackModal, setOpenFeedbackModal] = useState<boolean>(false)
   const lastPrediction = getPredictionFromLS()
+  const hasSubmittedFeedback = !Boolean(lastPrediction)
+
+  // to be triggered by Feedback Modal
+  const [_, setFeedbackSubmitted] = useState(false)
 
   // Problem Detail Store
   const isSubmitting = useProblemDetailStore((state) => state.isSubmitting)
@@ -48,6 +52,7 @@ const CodeEditor = ({ problem_id }: CodeEditorProps) => {
   }
 
   const submitMutation = useMutation({
+    mutationKey: ['submit'],
     mutationFn: submitCode,
     onSuccess: (response) => {
       setSubmission(response.data.data)
@@ -74,11 +79,6 @@ const CodeEditor = ({ problem_id }: CodeEditorProps) => {
       })
       return
     }
-    // Check if user has submitted feedback of the previous prediction or not
-    if (lastPrediction) {
-      setOpenFeedbackModal(true)
-      return
-    }
     const payload: SubmissionRequest = {
       problem_id: problem_id,
       source_code: editorContentRef.current
@@ -93,16 +93,16 @@ const CodeEditor = ({ problem_id }: CodeEditorProps) => {
     <div className='relative mb-4'>
       <div className='relative bg-gray-100 backdrop-blur rounded-xl border-2 p-6 shadow'>
         {/* Header */}
-        <div className='flex items-center justify-between mb-4'>
+        <div className='relative flex flex-wrap items-center justify-between mb-4 gap-2'>
           <Badge className='text-black bg-gray-200 border-lg rounded-xl py-2 px-4 font-semibold text-sm'>C++</Badge>
-          <div className='flex flex-row items-center gap-4'>
+          <div className='flex flex-row items-center gap-2 sm:gap-4 w-full sm:w-auto'>
             <div>
               <Button className='border-2 p-5 rounded-xl' variant='ghost' size='icon' onClick={toggleTheme}>
                 {theme === EDITOR_THEME.LIGHT ? <Sun /> : <Moon />}
               </Button>
             </div>
             {/* Font Size */}
-            <div className='flex items-center gap-3 border-2 p-2 rounded-xl'>
+            <div className='flex w-full sm:w-auto items-center gap-2 border-2 p-2 rounded-xl'>
               <TypeIcon className='size-4 text-zinc-600' />
               <Slider
                 defaultValue={[FONT_SIZE.DEFAULT]}
@@ -110,13 +110,12 @@ const CodeEditor = ({ problem_id }: CodeEditorProps) => {
                 max={FONT_SIZE.MAX}
                 step={FONT_SIZE.STEP}
                 onValueChange={(value) => handleFontSizeChange(value[0])}
-                className='w-24 h-[0.2rem] bg-zinc-900 text-black rounded-lg cursor-pointer'
+                className='w-full min-w-[100px] h-[0.2rem] bg-zinc-900 text-black rounded-lg cursor-pointer'
               />
               <span className='text-base min-w-[1.5rem] text-center'>{fontSize}</span>
             </div>
           </div>
         </div>
-        <div></div>
         {/* Code Editor */}
         <div className='relative group rounded-xl overflow-hidden ring-1 ring-white/[0.05]'>
           <Editor
@@ -148,15 +147,44 @@ const CodeEditor = ({ problem_id }: CodeEditorProps) => {
             }}
           />
         </div>
-        <Button
-          disabled={submitMutation.isPending || isSubmitting || isPredicting}
-          onClick={handleSubmit}
-          className={`text-base mt-4 px-8 py-4 rounded-xl text-white bg-zinc-800 hover:bg-zinc-800/80`}
-        >
-          {(submitMutation.isPending || isSubmitting || isPredicting) && <Loader2 className='size-4 animate-spin' />}
-          Submit
-        </Button>
-        <FeedbackModal open={openFeedbackModal} onOpenChange={setOpenFeedbackModal} lastPrediction={lastPrediction} />
+        {/* Submit */}
+        <div className='relative mt-4 flex flex-wrap items-center justify-between gap-2'>
+          {/* Buttons Section */}
+          <div className='flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end'>
+            <Button
+              disabled={!hasSubmittedFeedback || submitMutation.isPending || isSubmitting || isPredicting}
+              onClick={handleSubmit}
+              className='text-base px-6 py-3 sm:px-8 sm:py-4 rounded-xl text-white bg-zinc-800 hover:bg-zinc-800/80 w-full sm:w-fit'
+            >
+              {(submitMutation.isPending || isSubmitting || isPredicting) && (
+                <Loader2 className='size-4 animate-spin' />
+              )}
+              Submit Code
+            </Button>
+            {!hasSubmittedFeedback && (
+              <FeedbackModal
+                lastPrediction={lastPrediction}
+                onSubmittedFeedback={() => {
+                  setFeedbackSubmitted((prev) => !prev)
+                }}
+              />
+            )}
+            {/* {!hasSubmittedFeedback && <FeedbackModal lastPrediction={lastPrediction} />} */}
+          </div>
+          {/* Alert Message */}
+          {!hasSubmittedFeedback && (
+            <div className='w-full sm:w-auto'>
+              <Alert className='p-2 border-[1px] border-yellow-500 text-yellow-500 bg-yellow-50 rounded-xl flex items-center space-x-2'>
+                <div>
+                  <AlertCircle className='h-4 w-4' />
+                </div>
+                <AlertTitle className='mb-0 text-sm sm:text-base italic'>
+                  Bạn cần gửi phản hồi về lần dự đoán trước để tiếp tục nộp bài
+                </AlertTitle>
+              </Alert>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

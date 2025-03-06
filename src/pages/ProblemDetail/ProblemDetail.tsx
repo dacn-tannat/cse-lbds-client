@@ -1,3 +1,4 @@
+import { lazy, Suspense, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useMutation, useQuery } from '@tanstack/react-query'
 
@@ -6,15 +7,15 @@ import CodeEditor from './components/CodeEditor'
 import { predict, getProblemById } from '@/utils/apis'
 import { getIdFromSlug } from '@/utils/slug'
 import { useProblemDetailStore } from '@/store/useProblemDetailStore'
-import ErrorMessage from './components/ErrorMessage'
-import TestCaseTable from './components/TestCaseTable'
 import { toast } from '@/hooks/use-toast'
-import { useEffect } from 'react'
 import { SUBMISSION_MESSAGE } from '@/utils/constants'
-import PredictionResult from './components/PredictionResult/PredictionResult'
 import { savePredictionToLS } from '@/utils/local-storage'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Loader2 } from 'lucide-react'
+
+const TestCaseTable = lazy(() => import('./components/TestCaseTable'))
+const ErrorMessage = lazy(() => import('./components/ErrorMessage'))
+const PredictionResult = lazy(() => import('./components/PredictionResult'))
 
 export default function ProblemDetail() {
   const { slug } = useParams()
@@ -40,7 +41,6 @@ export default function ProblemDetail() {
   const predictMutation = useMutation({
     mutationFn: predict,
     onSuccess: (response) => {
-      console.log('prediction: ', response)
       setIsPredicting(false)
       setPrediction(response.data.data)
       // save prediction into local storage
@@ -87,13 +87,17 @@ export default function ProblemDetail() {
             <CodeEditor problem_id={problem.id} />
             {submission &&
               (submission.message !== SUBMISSION_MESSAGE.ACCEPTED_RESPONSE ? (
-                <ErrorMessage message={submission.message} status={submission.status} />
+                <Suspense>
+                  <ErrorMessage message={submission.message} status={submission.status} />
+                </Suspense>
               ) : (
-                <TestCaseTable
-                  score={submission.score}
-                  status={submission.status}
-                  testcases={submission.test_case_sample}
-                />
+                <Suspense>
+                  <TestCaseTable
+                    score={submission.score}
+                    status={submission.status}
+                    testcases={submission.test_case_sample}
+                  />
+                </Suspense>
               ))}
             {isPredicting && (
               <div>
@@ -102,13 +106,15 @@ export default function ProblemDetail() {
                   <div className='text-lg italic font-semibold'>Loading prediction...</div>
                 </div>
                 <div className='grid md:grid-cols-2 grid-cols-1 gap-4'>
-                  <Skeleton className='col-span-1 h-[400px] bg-gray-200 rounded-xl' />
                   <Skeleton className='col-span-1 h-[300px] bg-gray-200 rounded-xl' />
+                  <Skeleton className='col-span-1 h-[200px] bg-gray-200 rounded-xl' />
                 </div>
               </div>
             )}
             {prediction && (
-              <PredictionResult buggyPositions={prediction.buggy_position} source_code={submission?.source_code!} />
+              <Suspense>
+                <PredictionResult buggyPositions={prediction.buggy_position} source_code={submission?.source_code!} />
+              </Suspense>
             )}
           </div>
         )}
