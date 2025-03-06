@@ -1,5 +1,5 @@
 import { useLocation } from 'react-router-dom'
-import useAppRoutes from './hooks/useAppRoutes'
+import useAppRoutes from './hooks/use-app-routes'
 import { useEffect } from 'react'
 
 const ScrollToTop = () => {

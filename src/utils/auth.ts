@@ -1,11 +1,14 @@
 import { useAuthStore } from '@/store/useAuthStore'
 import { clearAccessTokenFromLS, clearUserFromLS } from './local-storage'
+import { envConfig } from '@/config/env.config'
 
-/* OAuth Login Google */
+/**
+ * Google OAuth Login
+ */
 export const generateGoogleAuthUrl = (): string => {
   const query = {
-    client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-    redirect_uri: import.meta.env.VITE_GOOGLE_REDIRECT_URI,
+    client_id: envConfig.GOOGLE_CLIENT_ID,
+    redirect_uri: envConfig.GOOGLE_REDIRECT_URI,
     response_type: 'code',
     scope: ['https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email'].join(
       ' '
@@ -15,7 +18,9 @@ export const generateGoogleAuthUrl = (): string => {
   return `https://accounts.google.com/o/oauth2/auth?${new URLSearchParams(query).toString()}`
 }
 
-/* Logout */
+/**
+ * Logout
+ */
 export const logout = () => {
   clearAccessTokenFromLS()
   clearUserFromLS()

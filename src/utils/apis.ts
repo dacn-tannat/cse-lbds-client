@@ -1,4 +1,4 @@
-import axiosInstance from '@/utils/axios'
+import axiosInstance from '@/config/axios.config'
 import {
   ApiResponse,
   BugCheckRequest,

@@ -1,3 +1,4 @@
+import { envConfig } from '@/config/env.config'
 import { useAuthStore } from '@/store/useAuthStore'
 import { User } from '@/types'
 import { logout } from '@/utils/auth'
@@ -11,8 +12,8 @@ class AxiosClient {
 
   constructor() {
     this.instance = axios.create({
-      baseURL: import.meta.env.VITE_API_URL,
-      timeout: 5 * 60 * 1000, // 5 mins
+      baseURL: envConfig.API_URL,
+      timeout: 10 * 60 * 1000, // 10 mins
       headers: {
         'Content-Type': 'application/json'
       }
