@@ -12,7 +12,7 @@ interface TestCaseProps {
 
 const TestCaseTable = ({ testcases, score, status }: TestCaseProps) => {
   return (
-    <div className='relative bg-orange-100 backdrop-blur rounded-xl p-6 shadow mt-4'>
+    <div className='relative bg-orange-100 backdrop-blur rounded-xl p-6 shadow mb-4'>
       {/* Table */}
       <div className='relative group rounded-xl overflow-hidden ring-1 ring-white/[0.05]'>
         <div className={`p-4 ${score < 1 ? 'bg-yellow-100' : 'bg-green-200'}`}>

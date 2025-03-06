@@ -1,5 +1,5 @@
 import { User } from '@/types'
-import { getAccessTokenFromLS, getUserFromLS } from '@/utils/auth'
+import { getAccessTokenFromLS, getUserFromLS } from '@/utils/local-storage'
 import { create } from 'zustand'
 
 interface AuthState {

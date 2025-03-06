@@ -1,6 +1,7 @@
 import { useAuthStore } from '@/store/useAuthStore'
 import { User } from '@/types'
-import { getAccessTokenFromLS, getUserFromLS, saveAccessTokenToLS, saveUserToLS, logout } from '@/utils/auth'
+import { logout } from '@/utils/auth'
+import { getAccessTokenFromLS, getUserFromLS, saveAccessTokenToLS, saveUserToLS } from '@/utils/local-storage'
 import axios, { AxiosInstance } from 'axios'
 
 class AxiosClient {

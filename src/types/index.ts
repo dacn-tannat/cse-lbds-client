@@ -66,8 +66,16 @@ export interface PredictionResponse {
   source_code_id: number
   buggy_position: BuggyPosition[]
 }
+
+export type BugCheckTypeValue = (typeof BUG_CHECK_TYPE)[keyof typeof BUG_CHECK_TYPE]
 export interface BugCheckRequest {
   prediction_id: number
   position: number[]
-  type: (typeof BUG_CHECK_TYPE)[keyof typeof BUG_CHECK_TYPE]
+  type: BugCheckTypeValue
+}
+
+export interface PredictionLS {
+  predictionId: number // prediction id
+  sourceCode: string
+  buggyPositions: BuggyPosition[] // buggyPosition.id
 }

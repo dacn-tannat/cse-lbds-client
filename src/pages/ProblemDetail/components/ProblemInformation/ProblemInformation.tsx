@@ -5,9 +5,8 @@ import { Problem } from '@/types'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 const ProblemInformation = ({ problem }: { problem: Problem }) => {
-  console.log('>>> PROBLEM INFORMATION')
   return (
-    <div className='bg-gray-100 shadow rounded-xl p-6 border-2'>
+    <div className='bg-gray-100 shadow rounded-xl p-6 border-2 mb-4'>
       <div className='text-xl font-semibold mb-2'>Mô tả:</div>
       <div
         className='text-gray-800 mb-4'

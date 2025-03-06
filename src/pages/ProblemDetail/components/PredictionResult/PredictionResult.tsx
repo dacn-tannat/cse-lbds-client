@@ -1,20 +1,20 @@
-import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { BuggyPosition } from '@/types'
 import { highlightBugs } from '@/utils/source-code'
 import DOMPurify from 'dompurify'
 import { memo } from 'react'
 
-interface PredictionResultProps {
-  buggyPositions: BuggyPosition[]
+export interface PredictionResultProps {
   source_code: string
+  buggyPositions: BuggyPosition[]
 }
 
 const PredictionResult = ({ buggyPositions, source_code }: PredictionResultProps) => {
   return (
-    <div className='grid grid-cols-2 mt-6 space-x-4'>
+    <div className='grid md:grid-cols-2 grid-cols-1 gap-4'>
+      {/* Source code */}
       <div className='col-span-1'>
-        <div className='text-2xl font-bold mb-4 text-gray-700'>Source code</div>
+        <div className='text-2xl mb-4 font-bold text-gray-700'>Source code</div>
         <div className='p-4 bg-gray-100 text-gray-700 rounded-xl shadow-md border-b-2 border-gray-200 overflow-x-auto max-h-[400px] overflow-y-auto'>
           <pre
             className='whitespace-pre font-mono text-md'
@@ -22,9 +22,10 @@ const PredictionResult = ({ buggyPositions, source_code }: PredictionResultProps
           />
         </div>
       </div>
+      {/* Suggestions */}
       <div className='col-span-1'>
-        <div className='text-2xl font-bold mb-4 text-gray-700'>Gợi ý sửa lỗi</div>
-        <div className='max-h-[400px] overflow-y-auto'>
+        <div className='text-2xl mb-4 font-bold text-gray-700'>Gợi ý sửa lỗi</div>
+        <div className='max-h-[400px] overflow-y-auto mb-2'>
           <Table className='border-collapse'>
             <TableHeader className='sticky top-0 bg-gray-200 border-2 border-gray-300 text-center text-base'>
               <TableRow>
@@ -74,13 +75,11 @@ const PredictionResult = ({ buggyPositions, source_code }: PredictionResultProps
             </TableBody>
           </Table>
         </div>
-
-        <Button
-          // onClick={handleBugCheck}
-          className='mt-4 px-6 py-3 rounded-xl text-white bg-zinc-800 hover:bg-zinc-800/80'
-        >
-          Submit feedback
-        </Button>
+        <div className='text-gray-600 italic'>
+          <span className='font-bold'>Lưu ý: </span>Bảng trên bao gồm một số vị trí lỗi{' '}
+          <span className='font-bold'>có thể đúng hoặc sai</span>. Các bạn sinh viên hãy dựa vào bảng gợi ý để chỉnh sửa
+          bài làm.
+        </div>
       </div>
     </div>
   )

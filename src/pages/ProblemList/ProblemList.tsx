@@ -60,7 +60,7 @@ export default function ProblemList() {
         <div className='text-4xl font-bold mb-8 text-center'>Kỹ thuật lập trình</div>
         {problems &&
           Object.entries(problems).map(([lab, problems]) => (
-            <Accordion type='multiple' className='w-full'>
+            <Accordion type='multiple' className='w-full' key={lab}>
               <AccordionItem value={`${lab}`} className='mb-3'>
                 <AccordionTrigger className='h-[3.5rem] w-full text-xl font-medium bg-gray-100 px-4 py-2 rounded-xl border-[2px] hover:bg-gray-300 hover:no-underline'>
                   {lab}

@@ -11,6 +11,8 @@ import { SubmissionRequest } from '@/types'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from '@/hooks/use-toast'
 import { useProblemDetailStore } from '@/store/useProblemDetailStore'
+import { getPredictionFromLS } from '@/utils/local-storage'
+import FeedbackModal from '../FeedbackModal'
 
 interface CodeEditorProps {
   problem_id: number
@@ -22,10 +24,12 @@ const CodeEditor = ({ problem_id }: CodeEditorProps) => {
 
   const editorContentRef = useRef<string>('')
 
+  const [openFeedbackModal, setOpenFeedbackModal] = useState<boolean>(false)
+  const lastPrediction = getPredictionFromLS()
+
   // Problem Detail Store
   const isSubmitting = useProblemDetailStore((state) => state.isSubmitting)
   const isPredicting = useProblemDetailStore((state) => state.isPredicting)
-
   const setIsSubmitting = useProblemDetailStore((state) => state.setIsSubmitting)
   const setSubmission = useProblemDetailStore((state) => state.setSubmission)
   const setPrediction = useProblemDetailStore((state) => state.setPrediction)
@@ -61,12 +65,18 @@ const CodeEditor = ({ problem_id }: CodeEditorProps) => {
   })
 
   const handleSubmit = () => {
+    // Empty source code
     if (!editorContentRef.current) {
       toast({
         variant: 'destructive',
         title: 'Lỗi',
         description: 'Source code rỗng. Vui lòng thử lại'
       })
+      return
+    }
+    // Check if user has submitted feedback of the previous prediction or not
+    if (lastPrediction) {
+      setOpenFeedbackModal(true)
       return
     }
     const payload: SubmissionRequest = {
@@ -80,9 +90,9 @@ const CodeEditor = ({ problem_id }: CodeEditorProps) => {
   }
 
   return (
-    <div className='relative mt-4'>
+    <div className='relative mb-4'>
       <div className='relative bg-gray-100 backdrop-blur rounded-xl border-2 p-6 shadow'>
-        {/* Code Editor Header */}
+        {/* Header */}
         <div className='flex items-center justify-between mb-4'>
           <Badge className='text-black bg-gray-200 border-lg rounded-xl py-2 px-4 font-semibold text-sm'>C++</Badge>
           <div className='flex flex-row items-center gap-4'>
@@ -146,6 +156,7 @@ const CodeEditor = ({ problem_id }: CodeEditorProps) => {
           {(submitMutation.isPending || isSubmitting || isPredicting) && <Loader2 className='size-4 animate-spin' />}
           Submit
         </Button>
+        <FeedbackModal open={openFeedbackModal} onOpenChange={setOpenFeedbackModal} lastPrediction={lastPrediction} />
       </div>
     </div>
   )

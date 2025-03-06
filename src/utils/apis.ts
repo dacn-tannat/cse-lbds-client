@@ -1,5 +1,14 @@
 import axiosInstance from '@/utils/axios'
-import { ApiResponse, PredictionResponse, Problem, SubmissionRequest, SubmissionResponse, User } from '@/types'
+import {
+  ApiResponse,
+  BugCheckRequest,
+  BuggyPosition,
+  PredictionResponse,
+  Problem,
+  SubmissionRequest,
+  SubmissionResponse,
+  User
+} from '@/types'
 
 /**
  * Auth
@@ -35,6 +44,14 @@ export const submitCode = (payload: SubmissionRequest) => {
  * Prediction
  */
 
-export const getPredictions = (source_code_id: number) => {
+export const predict = (source_code_id: number) => {
   return axiosInstance.post<ApiResponse<PredictionResponse>>(`/api/v1/prediction/${source_code_id}`)
+}
+
+/**
+ * Bug check
+ */
+
+export const bugCheck = (payload: BugCheckRequest) => {
+  return axiosInstance.put<ApiResponse<BuggyPosition[]>>('api/v1/prediction/bug-check', payload)
 }

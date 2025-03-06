@@ -3,7 +3,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 
 import ProblemInformation from './components/ProblemInformation'
 import CodeEditor from './components/CodeEditor'
-import { getPredictions, getProblemById } from '@/utils/apis'
+import { predict, getProblemById } from '@/utils/apis'
 import { getIdFromSlug } from '@/utils/slug'
 import { useProblemDetailStore } from '@/store/useProblemDetailStore'
 import ErrorMessage from './components/ErrorMessage'
@@ -12,6 +12,9 @@ import { toast } from '@/hooks/use-toast'
 import { useEffect } from 'react'
 import { SUBMISSION_MESSAGE } from '@/utils/constants'
 import PredictionResult from './components/PredictionResult/PredictionResult'
+import { savePredictionToLS } from '@/utils/local-storage'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Loader2 } from 'lucide-react'
 
 export default function ProblemDetail() {
   const { slug } = useParams()
@@ -23,6 +26,7 @@ export default function ProblemDetail() {
   const setPrediction = useProblemDetailStore((state) => state.setPrediction)
   const setIsPredicting = useProblemDetailStore((state) => state.setIsPredicting)
   const resetState = useProblemDetailStore((state) => state.resetState)
+  const isPredicting = useProblemDetailStore((state) => state.isPredicting)
 
   const { data: problemData } = useQuery({
     queryKey: ['problems', id],
@@ -34,10 +38,17 @@ export default function ProblemDetail() {
   const problem = problemData?.data.data
 
   const predictMutation = useMutation({
-    mutationFn: getPredictions,
+    mutationFn: predict,
     onSuccess: (response) => {
+      console.log('prediction: ', response)
       setIsPredicting(false)
       setPrediction(response.data.data)
+      // save prediction into local storage
+      savePredictionToLS({
+        predictionId: response.data.data!.id,
+        sourceCode: submission!.source_code,
+        buggyPositions: response.data.data!.buggy_position
+      })
     },
     onError: (error) => {
       toast({
@@ -84,6 +95,18 @@ export default function ProblemDetail() {
                   testcases={submission.test_case_sample}
                 />
               ))}
+            {isPredicting && (
+              <div>
+                <div className='flex gap-2 my-4 text-gray-600 items-center justify-center'>
+                  <Loader2 className='animate-spin size-6' />
+                  <div className='text-lg italic font-semibold'>Loading prediction...</div>
+                </div>
+                <div className='grid md:grid-cols-2 grid-cols-1 gap-4'>
+                  <Skeleton className='col-span-1 h-[400px] bg-gray-200 rounded-xl' />
+                  <Skeleton className='col-span-1 h-[300px] bg-gray-200 rounded-xl' />
+                </div>
+              </div>
+            )}
             {prediction && (
               <PredictionResult buggyPositions={prediction.buggy_position} source_code={submission?.source_code!} />
             )}
