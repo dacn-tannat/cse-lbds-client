@@ -12,20 +12,22 @@ const columns: ColumnDef<Problem>[] = [
   {
     id: 'id',
     accessorKey: 'id',
-    header: '#',
-    cell: ({ row }) => row.index + 1
+    header: '#'
   },
   {
     id: 'name',
     accessorKey: 'name',
     header: 'Tên'
-  },
-  {
-    id: 'category',
-    accessorKey: 'category',
-    header: 'Phân loại'
   }
 ]
+
+type CategoryProblems = {
+  [category: string]: Problem[]
+}
+
+type LabCategories = {
+  [labId: string]: CategoryProblems
+}
 
 export default function ProblemList() {
   const navigate = useNavigate()
@@ -36,18 +38,21 @@ export default function ProblemList() {
     staleTime: Infinity
   })
 
-  const problems =
+  const problemData =
     isSuccess &&
     (data?.data.data as Problem[])
       .filter((problem) => problem.is_active)
       .sort((a, b) => a.id - b.id)
       .reduce((acc, problem) => {
         if (!acc[problem.lab_id]) {
-          acc[problem.lab_id] = []
+          acc[problem.lab_id] = {}
         }
-        acc[problem.lab_id].push(problem)
+        if (!acc[problem.lab_id][problem.category]) {
+          acc[problem.lab_id][problem.category] = []
+        }
+        acc[problem.lab_id][problem.category].push(problem)
         return acc
-      }, {} as Record<string, Problem[]>)
+      }, {} as LabCategories)
 
   const handleRowClick = (problem: Problem) => {
     const slug = generateSlug(problem.name, problem.id)
@@ -57,20 +62,44 @@ export default function ProblemList() {
   return (
     <div className='bg-gray-50'>
       <div className='max-w-7xl mx-auto p-8 min-h-screen'>
-        <div className='text-4xl font-bold mb-8 text-center'>Kỹ thuật lập trình</div>
-        {problems &&
-          Object.entries(problems).map(([lab, problems]) => (
-            <Accordion type='multiple' className='w-full' key={lab}>
-              <AccordionItem value={`${lab}`} className='mb-3'>
-                <AccordionTrigger className='h-[3.5rem] w-full text-xl font-medium bg-gray-100 px-4 py-2 rounded-xl border-[2px] hover:bg-gray-300 hover:no-underline'>
-                  {lab}
+        <div className='text-3xl font-semibold mb-8 text-center'>
+          Danh sách bài tập Thực hành Kỹ thuật lập trình - HK242
+        </div>
+        {problemData && (
+          <Accordion type='single' collapsible className='w-full'>
+            {Object.entries(problemData).map(([labId, categories]) => (
+              <AccordionItem key={labId} value={labId} className='border rounded-xl mb-4'>
+                <AccordionTrigger className='px-6 py-4 font-medium text-xl bg-gray-200 rounded-xl text-gray-700'>
+                  {labId}
                 </AccordionTrigger>
-                <AccordionContent>
-                  <DataTable columns={columns} data={problems} onRowClick={handleRowClick} />
+                <AccordionContent className='px-4 pt-4 pb-2 bg-gray-50 rounded-xl'>
+                  <Accordion type='single' collapsible className='w-full'>
+                    {Object.entries(categories).map(([category, problems]) => (
+                      <AccordionItem
+                        key={category}
+                        value={category}
+                        className='border rounded-xl mb-4 bg-gray-100 text-gray-600'
+                      >
+                        <AccordionTrigger className='px-6 py-3'>
+                          <div className='flex items-center text-xl'>
+                            <span className='font-medium'>{category}</span>
+
+                            <span className='ml-1 text-gray-400 text-base'>({problems.length})</span>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className='px-6 py-3'>
+                          <div className='rounded-xl border'>
+                            <DataTable data={problems} columns={columns} onRowClick={handleRowClick} />
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
                 </AccordionContent>
               </AccordionItem>
-            </Accordion>
-          ))}
+            ))}
+          </Accordion>
+        )}
       </div>
     </div>
   )

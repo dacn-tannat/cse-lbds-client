@@ -31,6 +31,7 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
   }
 
   const { predictionId, buggyPositions, sourceCode } = lastPrediction
+  const bugIdList = Array.from({ length: buggyPositions.length }, (_, i) => i)
 
   // close modal by clicking DialogClose button
   const closeButtonRef = useRef<HTMLButtonElement>(null)
@@ -39,8 +40,8 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
     TOKEN_ERROR: number[]
     SUGGESTION_USEFUL: number[]
   }>({
-    TOKEN_ERROR: [],
-    SUGGESTION_USEFUL: []
+    TOKEN_ERROR: [...bugIdList],
+    SUGGESTION_USEFUL: [...bugIdList]
   })
 
   const handleCheckboxChange = (bugId: number, column: BugCheckTypeValue, checked: boolean) => {
@@ -50,6 +51,7 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
       selectedCheckboxesRef.current[column] = selectedCheckboxesRef.current[column].filter((_bugId) => _bugId !== bugId)
     }
   }
+
   const bugCheckMutation = useMutation({
     mutationFn: (payloads: BugCheckRequest[]) => Promise.all(payloads.map(bugCheck)),
     onSuccess: () => {
@@ -76,15 +78,6 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
 
     const { TOKEN_ERROR, SUGGESTION_USEFUL } = selectedCheckboxesRef.current
 
-    if (TOKEN_ERROR.length === 0 && SUGGESTION_USEFUL.length === 0) {
-      toast({
-        variant: 'destructive',
-        title: 'Lỗi',
-        description: 'Bạn cần tick vào ít nhất 1 gợi ý/ký tự lỗi'
-      })
-      return
-    }
-
     if (TOKEN_ERROR.length > 0) {
       payloads.push({
         prediction_id: predictionId,
@@ -105,7 +98,6 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
   }
 
   return (
-    // <Dialog open={isOpen} onOpenChange={setIsOpen}>
     <Dialog>
       <DialogTrigger asChild>
         <Button className='text-base px-8 py-4 rounded-xl text-white bg-yellow-500 hover:bg-yellow-500/80 w-full sm:w-fit'>
@@ -179,6 +171,7 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
                         <div className='flex flex-row justify-center items-center gap-4 mx-2'>
                           {bug.original_token}
                           <Checkbox
+                            defaultChecked={selectedCheckboxesRef.current[BUG_CHECK_TYPE.TOKEN_ERROR].includes(bug.id)}
                             onCheckedChange={(checked) =>
                               handleCheckboxChange(bug.id, BUG_CHECK_TYPE.TOKEN_ERROR, Boolean(checked))
                             }
@@ -193,6 +186,7 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
                         <div className='flex flex-row justify-center items-center gap-4 mx-2'>
                           {bug.predicted_token}
                           <Checkbox
+                            defaultChecked={selectedCheckboxesRef.current[BUG_CHECK_TYPE.TOKEN_ERROR].includes(bug.id)}
                             onCheckedChange={(checked) =>
                               handleCheckboxChange(bug.id, BUG_CHECK_TYPE.SUGGESTION_USEFUL, Boolean(checked))
                             }

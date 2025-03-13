@@ -1,10 +1,14 @@
+import { lazy, Suspense } from 'react'
 import { Navigate, Outlet, useRoutes } from 'react-router-dom'
-import HomePage from '@/pages/HomePage'
-import ProblemList from '@/pages/ProblemList'
-import ProblemDetail from '@/pages/ProblemDetail'
-import GoogleCallback from '@/pages/GoogleCallback'
+
 import { useAuthStore } from '@/store/useAuthStore'
 import Layout from '@/components/shared/Layout'
+
+const HomePage = lazy(() => import('@/pages/HomePage'))
+const ProblemList = lazy(() => import('@/pages/ProblemList'))
+const ProblemDetail = lazy(() => import('@/pages/ProblemDetail'))
+const GoogleCallback = lazy(() => import('@/pages/GoogleCallback'))
+const NotFound = lazy(() => import('@/pages/NotFound'))
 
 // eslint-disable-next-line react-refresh/only-export-components
 const ProtectedRoutes = () => {
@@ -22,32 +26,29 @@ export default function useAppRoutes() {
   const routes = useRoutes([
     {
       path: '/',
-      index: true,
-      element: (
-        <Layout>
-          <HomePage />
-        </Layout>
-      )
-    },
-    {
-      path: '/',
       element: <ProtectedRoutes />,
       children: [
         {
-          path: '/problems',
-          element: (
-            <Layout>
-              <ProblemList />
-            </Layout>
-          )
-        },
-        {
-          path: '/problems/:slug',
-          element: (
-            <Layout>
-              <ProblemDetail />
-            </Layout>
-          )
+          path: '/',
+          element: <Layout />,
+          children: [
+            {
+              path: '/problems',
+              element: (
+                <Suspense>
+                  <ProblemList />
+                </Suspense>
+              )
+            },
+            {
+              path: '/problems/:slug',
+              element: (
+                <Suspense>
+                  <ProblemDetail />
+                </Suspense>
+              )
+            }
+          ]
         }
       ]
     },
@@ -57,7 +58,34 @@ export default function useAppRoutes() {
       children: [
         {
           path: 'auth/google/callback',
-          element: <GoogleCallback />
+          element: (
+            <Suspense>
+              <GoogleCallback />
+            </Suspense>
+          )
+        }
+      ]
+    },
+    {
+      path: '/',
+      element: <Layout />,
+      children: [
+        {
+          path: '/',
+          element: (
+            <Suspense>
+              <HomePage />
+            </Suspense>
+          ),
+          index: true
+        },
+        {
+          path: '*',
+          element: (
+            <Suspense>
+              <NotFound />
+            </Suspense>
+          )
         }
       ]
     }

@@ -103,46 +103,41 @@ export function DataTable<TData, TValue>({
           </DropdownMenuContent>
         </DropdownMenu> */}
       </div>
-      <div className='rounded-xl border'>
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead
-                    key={header.id}
-                    className={`text-lg border-r last:border-r-0 border-gray-200 font-semibold text-center`}
-                  >
-                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                  </TableHead>
+      <Table className='rounded-xl bg-gray-10'>
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => (
+                <TableHead key={header.id} className={`text-lg font-semibold text-center`}>
+                  {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                </TableHead>
+              ))}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && 'selected'}
+                onClick={() => onRowClick?.(row.original)} // Gọi hàm onRowClick với dữ liệu row
+                className={`text-lg text-center ${onRowClick && 'hover:bg-gray-100 cursor-pointer'}`} // Thêm hiệu ứng hover
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                 ))}
               </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                  onClick={() => onRowClick?.(row.original)} // Gọi hàm onRowClick với dữ liệu row
-                  className={`text-lg text-center ${onRowClick && 'hover:bg-gray-100 cursor-pointer'}`} // Thêm hiệu ứng hover
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className='h-24 text-center'>
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={columns.length} className='h-24 text-center'>
+                No results.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
       {/* Pagination */}
       {pagination && (
         <div className='flex items-center justify-between space-x-6 lg:space-x-8 py-4'>

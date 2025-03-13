@@ -23,26 +23,26 @@ export default function Header() {
 
   return (
     <header className='border-b sticky z-50 top-0 bg-gray-100'>
-      <div className='max-w-7xl mx-auto px-8 py-4 flex justify-between items-center'>
-        <div className='flex gap-4 md:gap-6 lg:gap-10'>
-          <Link to='/' className='text-md md:text-lg lg:text-xl font-semibold text-gray-700 hover:text-black'>
+      <div className='mx-auto max-w-7xl px-8 py-4 flex justify-between items-center'>
+        <div className='flex gap-4 md:gap-6 lg:gap-10 items-center'>
+          <Link to='/' className='text-md md:text-lg lg:text-xl font-normal text-gray-700 hover:text-black'>
             <Home />
           </Link>
           <Link to='/problems' className='text-md md:text-lg lg:text-xl font-normal text-gray-700 hover:text-black'>
-            <span>Problem List</span>
+            Problem List
           </Link>
         </div>
         {isAuth && user && (
           <DropdownMenu>
             <DropdownMenuTrigger className='cursor-pointer'>
               <Avatar>
-                <AvatarImage src={user.picture} />
+                <AvatarImage src={user.picture} alt='Avatar' />
                 <AvatarFallback>{user.name[0]}</AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent align='end' className='w-40 bg-slate-50 rounded-xl shadow-lg'>
-              <DropdownMenuItem className='p-2 cursor-pointer border-b-[1px]'>Lịch sử nộp bài</DropdownMenuItem>
-              <DropdownMenuItem className='p-2 cursor-pointer' onClick={handleLogout}>
+              {/* <DropdownMenuItem className='p-2 cursor-pointer border-b-[1px]'>Lịch sử nộp bài</DropdownMenuItem> */}
+              <DropdownMenuItem className='py-2 px-4 cursor-pointer' onClick={handleLogout}>
                 Đăng xuất
               </DropdownMenuItem>
             </DropdownMenuContent>

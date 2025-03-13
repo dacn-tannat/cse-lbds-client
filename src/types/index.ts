@@ -2,7 +2,11 @@ import { BUG_CHECK_TYPE } from '@/utils/constants'
 
 export interface ApiResponse<T> {
   detail: string
-  data?: T
+  data: T
+}
+
+export interface ErrorResponse {
+  detail: string
 }
 
 export interface User {

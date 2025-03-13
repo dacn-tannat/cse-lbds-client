@@ -1,4 +1,4 @@
-import { memo, useRef, useState } from 'react'
+import { memo, useEffect, useRef, useState } from 'react'
 import { Editor } from '@monaco-editor/react'
 import { AlertCircle, Loader2, Moon, Sun, TypeIcon } from 'lucide-react'
 
@@ -14,21 +14,28 @@ import { toast } from '@/hooks/use-toast'
 import { useProblemDetailStore } from '@/store/useProblemDetailStore'
 import { getPredictionFromLS } from '@/utils/local-storage'
 import { Alert, AlertTitle } from '@/components/ui/alert'
+import useCodeStore from '@/store/useCodeStore'
+import { useLocation } from 'react-router-dom'
 
 interface CodeEditorProps {
   problem_id: number
 }
 
 const CodeEditor = ({ problem_id }: CodeEditorProps) => {
+  // Current URL
+  const location = useLocation()
+
+  // Editor setting
   const [fontSize, setFontSize] = useState<number>(FONT_SIZE.DEFAULT)
   const [theme, setTheme] = useState<keyof typeof EDITOR_THEME>(EDITOR_THEME.DARK)
 
+  // This ref to saved source code typed from user or loaded from session storage
   const editorContentRef = useRef<string>('')
 
+  //! [UNSTABLE] Last prediction:
   const lastPrediction = getPredictionFromLS()
   const hasSubmittedFeedback = !Boolean(lastPrediction)
-
-  // to be triggered by Feedback Modal
+  // To be triggered by Feedback Modal
   const [_, setFeedbackSubmitted] = useState(false)
 
   // Problem Detail Store
@@ -38,10 +45,19 @@ const CodeEditor = ({ problem_id }: CodeEditorProps) => {
   const setSubmission = useProblemDetailStore((state) => state.setSubmission)
   const setPrediction = useProblemDetailStore((state) => state.setPrediction)
 
+  // Code Store
+  const code = useCodeStore((state) => state.getCode(problem_id))
+  const setCode = useCodeStore((state) => state.setCode)
+  const saveToSessionStorage = useCodeStore((state) => state.saveToSessionStorage)
+
+  /* ----------------- HANDLER ----------------- */
+
+  // Theme
   const toggleTheme = () => {
     setTheme(theme === EDITOR_THEME.LIGHT ? EDITOR_THEME.DARK : EDITOR_THEME.LIGHT)
   }
 
+  // Font size
   const handleFontSizeChange = (newSize: number) => {
     const size = Math.min(Math.max(newSize, FONT_SIZE.MIN), FONT_SIZE.MAX)
     setFontSize(size)
@@ -89,6 +105,23 @@ const CodeEditor = ({ problem_id }: CodeEditorProps) => {
     submitMutation.mutate(payload)
   }
 
+  // Save code into session storage and zustand when
+  useEffect(() => {
+    const handleSave = () => {
+      setCode(problem_id, editorContentRef.current) // Update zustand
+      saveToSessionStorage() // Save into session storage
+    }
+
+    // Save when F5
+    window.addEventListener('beforeunload', handleSave)
+
+    // Save when changing route
+    return () => {
+      handleSave()
+      window.removeEventListener('beforeunload', handleSave)
+    }
+  }, [location.pathname]) // activate when url is changed
+
   return (
     <div className='relative mb-4'>
       <div className='relative bg-gray-100 backdrop-blur rounded-xl border-2 p-6 shadow'>
@@ -119,9 +152,9 @@ const CodeEditor = ({ problem_id }: CodeEditorProps) => {
         {/* Code Editor */}
         <div className='relative group rounded-xl overflow-hidden ring-1 ring-white/[0.05]'>
           <Editor
-            height='400px'
+            height='350px'
             language='cpp'
-            value={editorContentRef.current}
+            value={code || editorContentRef.current}
             onChange={handleEditorChange}
             theme={`vs-${theme.toLowerCase()}`} // vs-dark, vs-light
             options={{

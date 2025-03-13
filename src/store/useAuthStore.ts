@@ -5,9 +5,14 @@ import { create } from 'zustand'
 interface AuthState {
   isAuth: boolean
   user: User | null
+  reset: () => void
 }
 
 export const useAuthStore = create<AuthState>(() => ({
   isAuth: Boolean(getAccessTokenFromLS()),
-  user: getUserFromLS()
+  user: getUserFromLS(),
+  reset: () => ({
+    isAuth: false,
+    user: null
+  })
 }))

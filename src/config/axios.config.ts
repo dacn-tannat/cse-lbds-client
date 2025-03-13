@@ -1,14 +1,13 @@
 import { envConfig } from '@/config/env.config'
+import { toast } from '@/hooks/use-toast'
 import { useAuthStore } from '@/store/useAuthStore'
-import { User } from '@/types'
 import { logout } from '@/utils/auth'
-import { getAccessTokenFromLS, getUserFromLS, saveAccessTokenToLS, saveUserToLS } from '@/utils/local-storage'
+import { getAccessTokenFromLS, saveAccessTokenToLS, saveUserToLS } from '@/utils/local-storage'
 import axios, { AxiosInstance } from 'axios'
 
 class AxiosClient {
   instance: AxiosInstance
   private accessToken: string
-  private user: User | null
 
   constructor() {
     this.instance = axios.create({
@@ -19,7 +18,6 @@ class AxiosClient {
       }
     })
     this.accessToken = getAccessTokenFromLS()
-    this.user = getUserFromLS()
 
     /**
      * request interceptor
@@ -45,7 +43,6 @@ class AxiosClient {
         if (response.config.url === '/api/v1/auth/login/google') {
           const { access_token, user } = response.data.data ?? {}
           this.accessToken = access_token
-          this.user = user
           saveAccessTokenToLS(access_token)
           saveUserToLS(user)
           useAuthStore.setState({ isAuth: true, user: response.data.data.user })
@@ -56,11 +53,13 @@ class AxiosClient {
         // Invalid/Expired access token
         if (error.response.status === 401) {
           this.accessToken = ''
-          this.user = null
           logout()
-          location.href = '/?reason=session_expired'
+          toast({
+            variant: 'destructive',
+            title: 'Thông báo',
+            description: 'Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại'
+          })
         }
-        return Promise.reject(error)
       }
     )
   }

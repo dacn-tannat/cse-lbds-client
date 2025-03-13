@@ -30,3 +30,5 @@ export const SUBMISSION_MESSAGE = {
   PARTLY_CORRECT: 'Your code failed one or more hidden tests',
   CORRECT: 'Passed all tests'
 }
+
+export const LOGOUT_EVENT = 'logout'

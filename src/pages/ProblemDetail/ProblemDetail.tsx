@@ -106,7 +106,7 @@ export default function ProblemDetail() {
                   <div className='text-lg italic font-semibold'>Loading prediction...</div>
                 </div>
                 <div className='grid md:grid-cols-2 grid-cols-1 gap-4'>
-                  <Skeleton className='col-span-1 h-[300px] bg-gray-200 rounded-xl' />
+                  <Skeleton className='col-span-1 h-[200px] bg-gray-200 rounded-xl' />
                   <Skeleton className='col-span-1 h-[200px] bg-gray-200 rounded-xl' />
                 </div>
               </div>

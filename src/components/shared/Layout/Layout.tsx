@@ -1,18 +1,23 @@
 import { Toaster } from '@/components/ui/toaster'
 import Header from '@/components/shared/Header'
 import Footer from '@/components/shared/Footer'
+import { Outlet } from 'react-router-dom'
+import { memo } from 'react'
 
 interface LayoutProps {
-  children: React.ReactNode
+  children?: React.ReactNode
 }
 
-export default function Layout({ children }: LayoutProps) {
+function Layout({ children }: LayoutProps) {
   return (
     <>
       <Header />
-      <main>{children}</main>
+      {children}
+      <Outlet />
       <Toaster />
       <Footer />
     </>
   )
 }
+
+export default memo(Layout)

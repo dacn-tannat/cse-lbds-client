@@ -22,6 +22,7 @@ const TestCaseTable = ({ testcases, score, status }: TestCaseProps) => {
                 <TableHead className='w-[50px] border-2 border-gray-200 bg-white'></TableHead>
                 <TableHead className='border-2 border-gray-200 font-semibold text-lg bg-white'>Test</TableHead>
                 <TableHead className='border-2 border-gray-200 font-semibold text-lg bg-white'>Expected</TableHead>
+                <TableHead className='border-2 border-gray-200 font-semibold text-lg bg-white'>Got</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -48,12 +49,17 @@ const TestCaseTable = ({ testcases, score, status }: TestCaseProps) => {
                   >
                     {testcase.expected_output!}
                   </TableCell>
+                  <TableCell
+                    className={`border-2 border-gray-200 font-mono ${index % 2 ? 'bg-gray-50' : 'bg-gray-100'}`}
+                  >
+                    {testcase.output}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
           <div className='mt-2 text-lg'>
-            <span className='font-medium text-gray-600'>{STATUS_TITLE_MAPPING[status]}</span>
+            <span className='font-normal text-gray-600'>{STATUS_TITLE_MAPPING[status]}</span>
           </div>
         </div>
       </div>
