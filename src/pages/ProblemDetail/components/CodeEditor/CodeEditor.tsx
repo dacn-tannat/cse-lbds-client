@@ -107,6 +107,10 @@ const CodeEditor = ({ problem_id }: CodeEditorProps) => {
 
   // Save code into session storage and zustand when
   useEffect(() => {
+    editorContentRef.current = code
+  }, [problem_id, code])
+
+  useEffect(() => {
     const handleSave = () => {
       setCode(problem_id, editorContentRef.current) // Update zustand
       saveToSessionStorage() // Save into session storage

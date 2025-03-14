@@ -1,5 +1,5 @@
 import { useAuthStore } from '@/store/useAuthStore'
-import { clearAccessTokenFromLS, clearUserFromLS } from './local-storage'
+import { clearLS } from './local-storage'
 import { envConfig } from '@/config/env.config'
 import { LOGOUT_EVENT } from './constants'
 
@@ -25,8 +25,12 @@ export const generateGoogleAuthUrl = (): string => {
  * Logout
  */
 export const logout = () => {
-  clearAccessTokenFromLS()
-  clearUserFromLS()
+  // Clear Local Storage
+  clearLS()
+  // Clear Session Storage
+  sessionStorage.removeItem('student_code')
+  // Clear Store
   useAuthStore.setState({ isAuth: false, user: null })
+  // Dispatch Logout Event for App
   LogoutEventTarget.dispatchEvent(new Event(LOGOUT_EVENT))
 }

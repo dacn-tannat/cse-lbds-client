@@ -47,3 +47,9 @@ export const getPredictionFromLS = (): PredictionLS | null => {
 export const clearPredictionFromLS = (): void => {
   localStorage.removeItem('prediction')
 }
+
+export const clearLS = (): void => {
+  clearAccessTokenFromLS()
+  clearUserFromLS()
+  clearPredictionFromLS()
+}
