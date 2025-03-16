@@ -37,3 +37,5 @@ export const generateSlug = (str: string, id: number): string => {
 export const getIdFromSlug = (slug: string): string => {
   return slug.split('-')[0]
 }
+
+export const normalizedText = (text: string) => text.replace(/(\r\n|\r|\n|\v|\f|\u0085|\u2028|\u2029)/g, '↵')

@@ -25,12 +25,16 @@ const ProblemInformation = ({ problem }: { problem: Problem }) => {
             return (
               <TableRow key={index}>
                 <TableCell
-                  className={`${index % 2 ? 'bg-white' : ''} border-2 border-gray-300 font-mono whitespace-pre-wrap`}
+                  className={`${
+                    index % 2 ? 'bg-white' : ''
+                  } border-2 border-gray-300 font-mono whitespace-pre-wrap text-left align-top`}
                 >
                   {example.input || example.testcode}
                 </TableCell>
                 <TableCell
-                  className={`${index % 2 ? 'bg-white' : ''} border-2 border-gray-300 font-mono whitespace-pre-wrap`}
+                  className={`${
+                    index % 2 ? 'bg-white' : ''
+                  } border-2 border-gray-300 font-mono whitespace-pre-wrap text-left align-top`}
                 >
                   {example.output}
                 </TableCell>

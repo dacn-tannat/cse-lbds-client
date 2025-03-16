@@ -147,7 +147,7 @@ const CodeEditor = ({ problem_id }: CodeEditorProps) => {
                 max={FONT_SIZE.MAX}
                 step={FONT_SIZE.STEP}
                 onValueChange={(value) => handleFontSizeChange(value[0])}
-                className='w-full min-w-[100px] h-[0.2rem] bg-zinc-900 text-black rounded-lg cursor-pointer'
+                className='w-full min-w-[100px] h-[0.2rem] bg-zinc-700 text-zinc-700 rounded-lg cursor-pointer'
               />
               <span className='text-base min-w-[1.5rem] text-center'>{fontSize}</span>
             </div>
@@ -179,7 +179,8 @@ const CodeEditor = ({ problem_id }: CodeEditorProps) => {
               roundedSelection: true,
               scrollbar: {
                 verticalScrollbarSize: 8,
-                horizontalScrollbarSize: 8
+                horizontalScrollbarSize: 8,
+                alwaysConsumeMouseWheel: false
               }
             }}
           />

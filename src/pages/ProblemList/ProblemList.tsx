@@ -62,7 +62,7 @@ export default function ProblemList() {
   return (
     <div className='bg-gray-50'>
       <div className='max-w-7xl mx-auto p-8 min-h-screen'>
-        <div className='text-3xl font-semibold mb-8 text-center'>
+        <div className='text-2xl lg:text-3xl font-semibold mb-8 text-center'>
           Danh sách bài tập Thực hành Kỹ thuật lập trình - HK242
         </div>
         {problemData && (

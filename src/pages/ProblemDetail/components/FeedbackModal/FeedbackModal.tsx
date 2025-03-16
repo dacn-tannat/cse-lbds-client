@@ -76,21 +76,21 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
   const handleSubmitFeedback = () => {
     const payloads: BugCheckRequest[] = []
 
-    const { TOKEN_ERROR, SUGGESTION_USEFUL } = selectedCheckboxesRef.current
+    const { TOKEN_ERROR: checkedErrors, SUGGESTION_USEFUL: checkedSuggestions } = selectedCheckboxesRef.current
 
-    if (TOKEN_ERROR.length > 0) {
+    if (checkedErrors.length > 0) {
       payloads.push({
         prediction_id: predictionId,
         type: BUG_CHECK_TYPE.TOKEN_ERROR,
-        position: TOKEN_ERROR
+        position: checkedErrors
       })
     }
 
-    if (SUGGESTION_USEFUL.length > 0) {
+    if (checkedSuggestions.length > 0) {
       payloads.push({
         prediction_id: predictionId,
         type: BUG_CHECK_TYPE.SUGGESTION_USEFUL,
-        position: SUGGESTION_USEFUL
+        position: checkedSuggestions
       })
     }
 
@@ -141,6 +141,9 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
                       Dòng
                     </TableHead>
                     <TableHead className='border-2 border-gray-300 font-semibold bg-gray-200 text-center text-base'>
+                      Cột
+                    </TableHead>
+                    <TableHead className='border-2 border-gray-300 font-semibold bg-gray-200 text-center text-base'>
                       Ký tự lỗi <span className='text-red-600 text-sm'>*</span>
                     </TableHead>
                     <TableHead className='border-2 border-gray-300 font-semibold bg-gray-200 text-center text-base'>
@@ -157,11 +160,14 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
                         {bug.id}
                       </TableCell>
                       <TableCell
-                        className={`border-2 border-gray-300 text-center whitespace-pre-wrap ${
-                          index % 2 ? 'bg-white' : 'bg-gray-100'
-                        }`}
+                        className={`border-2 border-gray-300 text-center ${index % 2 ? 'bg-white' : 'bg-gray-100'}`}
                       >
                         {bug.line_number}
+                      </TableCell>
+                      <TableCell
+                        className={`border-2 border-gray-300 text-center ${index % 2 ? 'bg-white' : 'bg-gray-100'}`}
+                      >
+                        {bug.col_number}
                       </TableCell>
                       <TableCell
                         className={`border-2 border-gray-300 text-center font-mono ${

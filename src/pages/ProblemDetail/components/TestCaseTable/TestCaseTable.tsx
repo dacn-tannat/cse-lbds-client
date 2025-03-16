@@ -38,19 +38,23 @@ const TestCaseTable = ({ testcases, score, status }: TestCaseProps) => {
                     )}
                   </TableCell>
                   <TableCell
-                    className={`border-2 border-gray-200 font-mono whitespace-pre-wrap ${
+                    className={`border-2 border-gray-200 font-mono text-left align-top whitespace-pre-wrap ${
                       index % 2 ? 'bg-gray-50' : 'bg-gray-100'
                     }`}
                   >
-                    {testcase.testcode}
+                    {testcase.input || testcase.testcode}
                   </TableCell>
                   <TableCell
-                    className={`border-2 border-gray-200 font-mono ${index % 2 ? 'bg-gray-50' : 'bg-gray-100'}`}
+                    className={`border-2 border-gray-200 font-mono text-left align-top ${
+                      index % 2 ? 'bg-gray-50' : 'bg-gray-100'
+                    }`}
                   >
                     {testcase.expected_output!}
                   </TableCell>
                   <TableCell
-                    className={`border-2 border-gray-200 font-mono ${index % 2 ? 'bg-gray-50' : 'bg-gray-100'}`}
+                    className={`border-2 border-gray-200 font-mono text-left align-top ${
+                      index % 2 ? 'bg-gray-50' : 'bg-gray-100'
+                    }`}
                   >
                     {testcase.output}
                   </TableCell>

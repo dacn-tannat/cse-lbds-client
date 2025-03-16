@@ -12,6 +12,7 @@ import { SUBMISSION_MESSAGE } from '@/utils/constants'
 import { savePredictionToLS } from '@/utils/local-storage'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Loader2 } from 'lucide-react'
+import NotFound from '../NotFound'
 
 const TestCaseTable = lazy(() => import('./components/TestCaseTable'))
 const ErrorMessage = lazy(() => import('./components/ErrorMessage'))
@@ -29,7 +30,7 @@ export default function ProblemDetail() {
   const resetState = useProblemDetailStore((state) => state.resetState)
   const isPredicting = useProblemDetailStore((state) => state.isPredicting)
 
-  const { data: problemData } = useQuery({
+  const { data: problemData, isError } = useQuery({
     queryKey: ['problems', id],
     queryFn: ({ queryKey }) => getProblemById(queryKey[1]),
     enabled: Boolean(id),
@@ -76,6 +77,8 @@ export default function ProblemDetail() {
       resetState()
     }
   }, [resetState])
+
+  if (isError) return <NotFound />
 
   return (
     <div className='bg-gray-50'>

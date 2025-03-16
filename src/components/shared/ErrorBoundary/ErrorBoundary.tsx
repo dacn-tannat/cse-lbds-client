@@ -36,7 +36,6 @@ export default class ErrorBoundary extends Component<Props, State> {
             <p className='text-4xl text-gray-600 md:text-5xl lg:text-6xl font-bold tracking-wider mt-4'>
               Something went wrong...
             </p>
-            <p className='text-lg text-gray-500 md:text-xl lg:text-2xl my-12'>Đi ra chỗ khác chơi!!!</p>
             <Button asChild className='bg-black text-white rounded-xl font-medium px-8 py-6 hover:bg-black/80 text-lg'>
               <a href='/'>
                 <Home className='block mr-2' /> Home

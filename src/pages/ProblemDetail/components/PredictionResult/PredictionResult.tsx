@@ -34,6 +34,9 @@ const PredictionResult = ({ buggyPositions, source_code }: PredictionResultProps
                   Dòng
                 </TableHead>
                 <TableHead className='border-2 border-gray-300 font-semibold bg-gray-200 text-center text-base'>
+                  Cột
+                </TableHead>
+                <TableHead className='border-2 border-gray-300 font-semibold bg-gray-200 text-center text-base'>
                   Ký tự lỗi
                 </TableHead>
                 <TableHead className='border-2 border-gray-300 font-semibold bg-gray-200 text-center text-base'>
@@ -55,6 +58,13 @@ const PredictionResult = ({ buggyPositions, source_code }: PredictionResultProps
                     }`}
                   >
                     {bug.line_number}
+                  </TableCell>
+                  <TableCell
+                    className={`border-2 border-gray-300 text-center whitespace-pre-wrap ${
+                      index % 2 ? 'bg-white' : 'bg-gray-100'
+                    }`}
+                  >
+                    {bug.col_number}
                   </TableCell>
                   <TableCell
                     className={`border-2 border-gray-300 text-center font-mono ${

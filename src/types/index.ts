@@ -61,6 +61,7 @@ export interface BuggyPosition {
   original_token: string
   predicted_token: string
   line_number: number
+  col_number: number
   is_token_error: boolean
   is_suggestion_useful: boolean
 }
