@@ -1,0 +1,4 @@
+### Restrict user
+POST http://localhost:8000/api/v1/user/restrict
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjI4LCJzdWIiOiIxMTM3NzA1NDQ1MTYyMzg0Mzk3NTgiLCJlbWFpbCI6ImFuaC5sZWR1eTA0QGhjbXV0LmVkdS52biIsImV4cCI6MTc0MjMzMzY3MH0.9WBld4GAga5hY3pZW1cEaSt57mq8XFaUsJNBGRBD42E

@@ -13,12 +13,19 @@ import { BugCheckRequest, BugCheckTypeValue, PredictionLS } from '@/types'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { highlightBugs } from '@/utils/source-code'
-import { clearPredictionFromLS } from '@/utils/local-storage'
+import {
+  clearPredictionFromLS,
+  getRemainingEmptyFeedbackSubmits,
+  saveRemainingEmptyFeedbackSubmits
+} from '@/utils/local-storage'
 import { Checkbox } from '@/components/ui/checkbox'
 import { BUG_CHECK_TYPE } from '@/utils/constants'
 import { useMutation } from '@tanstack/react-query'
-import { bugCheck } from '@/utils/apis'
+import { bugCheck, restrictUser } from '@/utils/apis'
 import { toast } from '@/hooks/use-toast'
+import { ToastAction } from '@/components/ui/toast'
+import { logout } from '@/utils/auth'
+import { cn } from '@/lib/utils'
 
 interface FeedbackModalProps {
   lastPrediction: PredictionLS | null
@@ -31,7 +38,8 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
   }
 
   const { predictionId, buggyPositions, sourceCode } = lastPrediction
-  const bugIdList = Array.from({ length: buggyPositions.length }, (_, i) => i)
+
+  const remainingSubmits = getRemainingEmptyFeedbackSubmits()
 
   // close modal by clicking DialogClose button
   const closeButtonRef = useRef<HTMLButtonElement>(null)
@@ -40,9 +48,13 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
     TOKEN_ERROR: number[]
     SUGGESTION_USEFUL: number[]
   }>({
-    TOKEN_ERROR: [...bugIdList],
-    SUGGESTION_USEFUL: [...bugIdList]
+    TOKEN_ERROR: [],
+    SUGGESTION_USEFUL: []
   })
+
+  const handleDefaultChecked = (bugCheckType: BugCheckTypeValue, bugId: number) => {
+    return selectedCheckboxesRef.current[bugCheckType].includes(bugId)
+  }
 
   const handleCheckboxChange = (bugId: number, column: BugCheckTypeValue, checked: boolean) => {
     if (checked) {
@@ -52,49 +64,104 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
     }
   }
 
+  const restrictUserMutation = useMutation({
+    mutationFn: restrictUser,
+    onSuccess: () => {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description:
+          'Your account has been temporarily suspended. You will not be able to access our services for the next 12 hours.'
+      })
+      logout()
+    }
+  })
+
   const bugCheckMutation = useMutation({
     mutationFn: (payloads: BugCheckRequest[]) => Promise.all(payloads.map(bugCheck)),
     onSuccess: () => {
       toast({
         variant: 'success',
-        title: 'Gửi phản hồi thành công',
-        description: 'Bạn có thể tiếp tục nộp bài'
+        title: 'Feedback sent successfully',
+        description: 'You can continue submitting your code'
       })
       clearPredictionFromLS()
       closeButtonRef.current?.click()
       onSubmittedFeedback()
     },
-    onError: (error) => {
+    onError: () => {
       toast({
         variant: 'destructive',
-        title: 'Có lỗi xảy ra trong quá trình gửi phản hồi về hệ thống',
-        description: error.message
+        title: 'Error',
+        description: 'An error occurred while sending feedback. Please try again'
       })
     }
   })
 
+  const handleDecreaseRemainingEmptySubmit = () => {
+    if (remainingSubmits === 0) {
+      saveRemainingEmptyFeedbackSubmits(3)
+      clearPredictionFromLS()
+      restrictUserMutation.mutate()
+    } else {
+      saveRemainingEmptyFeedbackSubmits(remainingSubmits - 1)
+      clearPredictionFromLS()
+      closeButtonRef.current?.click()
+      onSubmittedFeedback()
+      toast({
+        variant: 'success',
+        title: 'Noted empty feedback',
+        description: `You can only submit ${remainingSubmits - 1} more empty feedbacks. Be careful!`
+      })
+    }
+  }
+
   const handleSubmitFeedback = () => {
     const payloads: BugCheckRequest[] = []
 
+    const submitFeedback = async () => {
+      if (checkedErrors.length > 0) {
+        payloads.push({
+          prediction_id: predictionId,
+          type: BUG_CHECK_TYPE.TOKEN_ERROR,
+          position: checkedErrors
+        })
+      }
+
+      if (checkedSuggestions.length > 0) {
+        payloads.push({
+          prediction_id: predictionId,
+          type: BUG_CHECK_TYPE.SUGGESTION_USEFUL,
+          position: checkedSuggestions
+        })
+      }
+
+      bugCheckMutation.mutate(payloads)
+    }
+
     const { TOKEN_ERROR: checkedErrors, SUGGESTION_USEFUL: checkedSuggestions } = selectedCheckboxesRef.current
 
-    if (checkedErrors.length > 0) {
-      payloads.push({
-        prediction_id: predictionId,
-        type: BUG_CHECK_TYPE.TOKEN_ERROR,
-        position: checkedErrors
+    if (checkedErrors.length === 0 && checkedSuggestions.length === 0) {
+      toast({
+        variant: 'warning',
+        title: 'Empty feedback',
+        description:
+          'We only allow users to submit empty feedback up to 3 times. After 3 times, your account will be suspended from all website activities within 12 hours.',
+        action: (
+          <ToastAction
+            altText='Confirm'
+            onClick={async () => {
+              await handleDecreaseRemainingEmptySubmit()
+            }}
+          >
+            Confirm
+          </ToastAction>
+        ),
+        className: cn('w-[520px] bottom-0 right-0 fixed mr-4 mb-4')
       })
+    } else {
+      submitFeedback()
     }
-
-    if (checkedSuggestions.length > 0) {
-      payloads.push({
-        prediction_id: predictionId,
-        type: BUG_CHECK_TYPE.SUGGESTION_USEFUL,
-        position: checkedSuggestions
-      })
-    }
-
-    bugCheckMutation.mutate(payloads)
   }
 
   return (
@@ -106,13 +173,15 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
       </DialogTrigger>
       <DialogContent className='w-3/4 max-w-[100vw] max-h-[80vh] bg-white overflow-auto'>
         <DialogHeader>
-          <DialogTitle className='text-2xl'>Submit Feedback</DialogTitle>
+          <DialogTitle className='text-2xl'>Send Feedback</DialogTitle>
           <DialogDescription>
-            <span className='mb-2 italic text-gray-500 block'>Vui lòng phản hồi trước khi nộp bài mới.</span>
+            <span className='mb-2 italic text-gray-500 block'>
+              Please send feedback before submitting new source code
+            </span>
             <span>
-              <span className='font-bold'>Lưu ý: </span>Bảng trên bao gồm một số vị trí lỗi{' '}
-              <span className='font-bold'>có thể đúng hoặc sai</span>. Các bạn sinh viên hãy dựa vào bảng gợi ý để chỉnh
-              sửa bài làm.
+              <span className='font-bold'>Note: </span>The table includes some error positions that{' '}
+              <span className='font-bold'>may be correct or incorrect</span>. Students should use the suggestions to
+              make corrections.
             </span>
           </DialogDescription>
         </DialogHeader>
@@ -129,7 +198,7 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
           </div>
           {/* Suggestions */}
           <div className='col-span-1'>
-            <div className='text-xl mb-2 font-bold text-gray-700'>Gợi ý sửa lỗi</div>
+            <div className='text-xl mb-2 font-bold text-gray-700'>Suggestion</div>
             <div className='max-h-[400px] overflow-y-auto mb-2'>
               <Table className='border-collapse'>
                 <TableHeader className='sticky top-0 bg-gray-200 border-2 border-gray-300 text-center text-base'>
@@ -138,16 +207,16 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
                       #
                     </TableHead>
                     <TableHead className='border-2 border-gray-300 font-semibold bg-gray-200 text-center text-base'>
-                      Dòng
+                      Line
                     </TableHead>
                     <TableHead className='border-2 border-gray-300 font-semibold bg-gray-200 text-center text-base'>
-                      Cột
+                      Column
                     </TableHead>
                     <TableHead className='border-2 border-gray-300 font-semibold bg-gray-200 text-center text-base'>
-                      Ký tự lỗi <span className='text-red-600 text-sm'>*</span>
+                      Position to review <span className='text-red-600 text-sm'>*</span>
                     </TableHead>
                     <TableHead className='border-2 border-gray-300 font-semibold bg-gray-200 text-center text-base'>
-                      Gợi ý <span className='text-yellow-700 text-sm'>**</span>
+                      Suggestion <span className='text-yellow-700 text-sm'>**</span>
                     </TableHead>
                   </TableRow>
                 </TableHeader>
@@ -177,7 +246,7 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
                         <div className='flex flex-row justify-center items-center gap-4 mx-2'>
                           {bug.original_token}
                           <Checkbox
-                            defaultChecked={selectedCheckboxesRef.current[BUG_CHECK_TYPE.TOKEN_ERROR].includes(bug.id)}
+                            defaultChecked={handleDefaultChecked(BUG_CHECK_TYPE.TOKEN_ERROR, bug.id)}
                             onCheckedChange={(checked) =>
                               handleCheckboxChange(bug.id, BUG_CHECK_TYPE.TOKEN_ERROR, Boolean(checked))
                             }
@@ -192,7 +261,7 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
                         <div className='flex flex-row justify-center items-center gap-4 mx-2'>
                           {bug.predicted_token}
                           <Checkbox
-                            defaultChecked={selectedCheckboxesRef.current[BUG_CHECK_TYPE.TOKEN_ERROR].includes(bug.id)}
+                            defaultChecked={handleDefaultChecked(BUG_CHECK_TYPE.SUGGESTION_USEFUL, bug.id)}
                             onCheckedChange={(checked) =>
                               handleCheckboxChange(bug.id, BUG_CHECK_TYPE.SUGGESTION_USEFUL, Boolean(checked))
                             }
@@ -206,10 +275,10 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
             </div>
             <div className='space-y-2'>
               <div className='text-red-600 italic text-sm'>
-                [*] Đánh dấu những <span className='font-bold'>ký tự</span> bạn đã sử dụng để sửa lỗi
+                [*] Mark all the <span className='font-bold'>positions</span> you used to correct the errors.
               </div>
               <div className='text-yellow-700 italic text-sm'>
-                [**] Đánh dấu những <span className='font-bold'>gợi ý</span> bạn đã sử dụng để sửa lỗi
+                [**] Mark all the <span className='font-bold'>suggestions</span> you used to correct the errors
               </div>
               <div className='flex flex-wrap justify-end items-center gap-2'>
                 <Button

@@ -24,23 +24,23 @@ const PredictionResult = ({ buggyPositions, source_code }: PredictionResultProps
       </div>
       {/* Suggestions */}
       <div className='col-span-1'>
-        <div className='text-2xl mb-4 font-bold text-gray-700'>Gợi ý sửa lỗi</div>
+        <div className='text-2xl mb-4 font-bold text-gray-700'>Suggestion</div>
         <div className='max-h-[400px] overflow-y-auto mb-2'>
           <Table className='border-collapse'>
             <TableHeader className='sticky top-0 bg-gray-200 border-2 border-gray-300 text-center text-base'>
               <TableRow>
                 <TableHead className='w-[50px] border-2 border-gray-300 bg-gray-200 text-center text-base'>#</TableHead>
                 <TableHead className='border-2 border-gray-300 font-semibold bg-gray-200 text-center text-base'>
-                  Dòng
+                  Line
                 </TableHead>
                 <TableHead className='border-2 border-gray-300 font-semibold bg-gray-200 text-center text-base'>
-                  Cột
+                  Column
                 </TableHead>
                 <TableHead className='border-2 border-gray-300 font-semibold bg-gray-200 text-center text-base'>
-                  Ký tự lỗi
+                  Position to review
                 </TableHead>
                 <TableHead className='border-2 border-gray-300 font-semibold bg-gray-200 text-center text-base'>
-                  Gợi ý
+                  Suggestion
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -86,9 +86,9 @@ const PredictionResult = ({ buggyPositions, source_code }: PredictionResultProps
           </Table>
         </div>
         <div className='text-gray-600 italic'>
-          <span className='font-bold'>Lưu ý: </span>Bảng trên bao gồm một số vị trí lỗi{' '}
-          <span className='font-bold'>có thể đúng hoặc sai</span>. Các bạn sinh viên hãy dựa vào bảng gợi ý để chỉnh sửa
-          bài làm.
+          <span className='font-bold'>Note: </span>The table includes some error positions that{' '}
+          <span className='font-bold'>may be correct or incorrect</span>. Students should use the suggestions to make
+          corrections.
         </div>
       </div>
     </div>

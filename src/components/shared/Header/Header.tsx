@@ -15,8 +15,8 @@ export default function Header() {
     logout()
     toast({
       variant: 'success',
-      title: 'Thành công',
-      description: 'Đăng xuất thành công'
+      title: 'Success',
+      description: 'Logout successfully'
     })
     navigate('/')
   }
@@ -43,7 +43,7 @@ export default function Header() {
             <DropdownMenuContent align='end' className='w-40 bg-slate-50 rounded-xl shadow-lg'>
               {/* <DropdownMenuItem className='p-2 cursor-pointer border-b-[1px]'>Lịch sử nộp bài</DropdownMenuItem> */}
               <DropdownMenuItem className='py-2 px-4 cursor-pointer' onClick={handleLogout}>
-                Đăng xuất
+                Logout
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

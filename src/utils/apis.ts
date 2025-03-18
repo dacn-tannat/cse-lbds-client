@@ -1,5 +1,6 @@
 import axiosInstance from '@/config/axios.config'
 import {
+  AccountResponse,
   ApiResponse,
   BugCheckRequest,
   BuggyPosition,
@@ -7,7 +8,7 @@ import {
   Problem,
   SubmissionRequest,
   SubmissionResponse,
-  User
+  UserPayload
 } from '@/types'
 
 /**
@@ -15,7 +16,7 @@ import {
  */
 
 export const loginWithGoogle = (code: string) => {
-  return axiosInstance.post<ApiResponse<{ user: User; access_token: string }>>('/api/v1/auth/login/google', {
+  return axiosInstance.post<ApiResponse<AccountResponse>>('/api/v1/auth/login/google', {
     code
   })
 }
@@ -53,5 +54,13 @@ export const predict = (source_code_id: number) => {
  */
 
 export const bugCheck = (payload: BugCheckRequest) => {
-  return axiosInstance.put<ApiResponse<BuggyPosition[]>>('api/v1/prediction/bug-check', payload)
+  return axiosInstance.put<ApiResponse<BuggyPosition[]>>('/api/v1/prediction/bug-check', payload)
+}
+
+/**
+ * User
+ */
+
+export const restrictUser = () => {
+  return axiosInstance.post<ApiResponse<UserPayload>>('/api/v1/user/restrict')
 }

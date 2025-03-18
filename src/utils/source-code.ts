@@ -29,3 +29,7 @@ const escapeHtml = (str: string): string => {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;')
 }
+
+export const normalizedText = (text: string) => {
+  return /(\r\n|\r|\n|\v|\f|\u0085|\u2028|\u2029)$/.test(text) ? text.slice(0, -1) + '↵' : text
+}

@@ -33,7 +33,7 @@ export default class ErrorBoundary extends Component<Props, State> {
           {/* Left column - Content */}
           <div className='w-full lg:w-1/2 flex flex-col items-center justify-center lg:px-2 xl:px-0 text-center'>
             <p className='text-7xl text-gray-800 md:text-8xl lg:text-9xl font-bold tracking-wider'>500</p>
-            <p className='text-4xl text-gray-600 md:text-5xl lg:text-6xl font-bold tracking-wider mt-4'>
+            <p className='text-4xl text-gray-600 md:text-5xl lg:text-6xl font-bold tracking-wider my-4'>
               Something went wrong...
             </p>
             <Button asChild className='bg-black text-white rounded-xl font-medium px-8 py-6 hover:bg-black/80 text-lg'>

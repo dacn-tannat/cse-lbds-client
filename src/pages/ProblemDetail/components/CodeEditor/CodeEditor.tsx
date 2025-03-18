@@ -46,9 +46,9 @@ const CodeEditor = ({ problem_id }: CodeEditorProps) => {
   const setPrediction = useProblemDetailStore((state) => state.setPrediction)
 
   // Code Store
-  const code = useCodeStore((state) => state.getCode(problem_id))
-  const setCode = useCodeStore((state) => state.setCode)
-  const saveToSessionStorage = useCodeStore((state) => state.saveToSessionStorage)
+  const code = useCodeStore((state) => state.getProblemCode(problem_id))
+  const setCodes = useCodeStore((state) => state.setCodes)
+  const saveCodes = useCodeStore((state) => state.saveCodes)
 
   /* ----------------- HANDLER ----------------- */
 
@@ -68,7 +68,6 @@ const CodeEditor = ({ problem_id }: CodeEditorProps) => {
   }
 
   const submitMutation = useMutation({
-    mutationKey: ['submit'],
     mutationFn: submitCode,
     onSuccess: (response) => {
       setSubmission(response.data.data)
@@ -77,7 +76,7 @@ const CodeEditor = ({ problem_id }: CodeEditorProps) => {
     onError: (error) => {
       toast({
         variant: 'destructive',
-        title: 'Có lỗi xảy ra trong quá trình nộp bài',
+        title: 'An error occurred while submitting source code. Please try again',
         description: error.message
       })
       setIsSubmitting(false)
@@ -91,7 +90,7 @@ const CodeEditor = ({ problem_id }: CodeEditorProps) => {
       toast({
         variant: 'destructive',
         title: 'Lỗi',
-        description: 'Source code rỗng. Vui lòng thử lại'
+        description: 'Empty source code. Please try again'
       })
       return
     }
@@ -112,8 +111,8 @@ const CodeEditor = ({ problem_id }: CodeEditorProps) => {
 
   useEffect(() => {
     const handleSave = () => {
-      setCode(problem_id, editorContentRef.current) // Update zustand
-      saveToSessionStorage() // Save into session storage
+      setCodes(problem_id, editorContentRef.current) // Update zustand
+      saveCodes() // Save into session storage
     }
 
     // Save when F5
@@ -217,7 +216,7 @@ const CodeEditor = ({ problem_id }: CodeEditorProps) => {
                   <AlertCircle className='h-4 w-4' />
                 </div>
                 <AlertTitle className='mb-0 text-sm sm:text-base italic'>
-                  Bạn cần gửi phản hồi về lần dự đoán trước để tiếp tục nộp bài
+                  You need to send feedback on the previous prediction before submitting again.
                 </AlertTitle>
               </Alert>
             </div>

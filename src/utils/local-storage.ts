@@ -48,8 +48,24 @@ export const clearPredictionFromLS = (): void => {
   localStorage.removeItem('prediction')
 }
 
+/**
+ * Empty feedback submission number
+ */
+
+export const saveRemainingEmptyFeedbackSubmits = (remainingSubmits: number) => {
+  localStorage.setItem('remaining_empty_feedback_submits', remainingSubmits.toString())
+}
+
+export const getRemainingEmptyFeedbackSubmits = () => {
+  const remainingSubmits = localStorage.getItem('remaining_empty_feedback_submits')
+  return remainingSubmits ? Number(remainingSubmits) : 3
+}
+
+export const clearRemainingEmptyFeedbackSubmits = () => {
+  localStorage.removeItem('remaining_empty_feedback_submits')
+}
+
 export const clearLS = (): void => {
   clearAccessTokenFromLS()
   clearUserFromLS()
-  clearPredictionFromLS()
 }

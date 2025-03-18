@@ -9,16 +9,40 @@ export interface ErrorResponse {
   detail: string
 }
 
+/**
+ * User
+ */
+
 export interface User {
-  sub: string // id
   email: string
-  email_verified: boolean
-  family_name: boolean
-  given_name: boolean
+  first_time_login: boolean
   name: string
   picture: string
+  sub: string
 }
 
+export interface UserPayload {
+  id: number
+  sub: string
+  email: string
+  exp: number
+}
+
+export interface AccountResponse {
+  access_token: string
+  user: User
+}
+
+/**
+ * Problem
+ */
+export interface TestCase {
+  input: string
+  output: string
+  testcode: boolean
+  is_correct?: boolean
+  expected_output?: string
+}
 export interface Problem {
   id: number
   name: string
@@ -26,10 +50,13 @@ export interface Problem {
   lab_id: string
   is_active: boolean
   description?: string
-  constrain?: string[]
   examples?: TestCase[]
+  constrain?: string[]
 }
 
+/**
+ * Submission
+ */
 export interface SubmissionRequest {
   problem_id: number
   source_code: string
@@ -46,14 +73,9 @@ export interface SubmissionResponse {
   message: string
 }
 
-export interface TestCase {
-  input: string
-  output: string
-  testcode: boolean
-  is_correct?: boolean
-  expected_output?: string
-}
-
+/**
+ * Prediction
+ */
 export interface BuggyPosition {
   id: number
   position: number
@@ -72,15 +94,18 @@ export interface PredictionResponse {
   buggy_position: BuggyPosition[]
 }
 
+export interface PredictionLS {
+  predictionId: number // prediction id
+  sourceCode: string
+  buggyPositions: BuggyPosition[] // buggyPosition.id
+}
+
+/**
+ * Bug check
+ */
 export type BugCheckTypeValue = (typeof BUG_CHECK_TYPE)[keyof typeof BUG_CHECK_TYPE]
 export interface BugCheckRequest {
   prediction_id: number
   position: number[]
   type: BugCheckTypeValue
-}
-
-export interface PredictionLS {
-  predictionId: number // prediction id
-  sourceCode: string
-  buggyPositions: BuggyPosition[] // buggyPosition.id
 }

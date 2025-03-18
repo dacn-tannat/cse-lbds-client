@@ -1,6 +1,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { TestCase } from '@/types'
 import { STATUS_TITLE_MAPPING } from '@/utils/constants'
+import { normalizedText } from '@/utils/source-code'
 import { Check, X } from 'lucide-react'
 import { memo } from 'react'
 
@@ -45,18 +46,18 @@ const TestCaseTable = ({ testcases, score, status }: TestCaseProps) => {
                     {testcase.input || testcase.testcode}
                   </TableCell>
                   <TableCell
-                    className={`border-2 border-gray-200 font-mono text-left align-top ${
+                    className={`border-2 border-gray-200 font-mono text-left align-top  ${
                       index % 2 ? 'bg-gray-50' : 'bg-gray-100'
                     }`}
                   >
                     {testcase.expected_output!}
                   </TableCell>
                   <TableCell
-                    className={`border-2 border-gray-200 font-mono text-left align-top ${
+                    className={`border-2 border-gray-200 font-mono text-left align-top whitespace-pre-wrap ${
                       index % 2 ? 'bg-gray-50' : 'bg-gray-100'
                     }`}
                   >
-                    {testcase.output}
+                    {normalizedText(testcase.output)}
                   </TableCell>
                 </TableRow>
               ))}

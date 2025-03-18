@@ -29,7 +29,7 @@ export default function HomePage() {
           rootMargin='-50px'
         />
         <BlurText
-          text='Hệ thống phát hiện và gợi ý sửa lỗi logic cho các bài tập trong khoá học Thực hành - Kỹ thuật Lập trình'
+          text='System for detecting and suggesting fixes for logical bugs in programming exercises'
           delay={20}
           animateBy='words'
           direction='top'
@@ -42,14 +42,14 @@ export default function HomePage() {
           <div>
             <Link to='/problems' className='flex gap-2 items-center justify-center text-blue-700 hover:underline'>
               <ChevronRightIcon className='size-6' />
-              <div className='italic text-sm sm:text-base md:text-lg lg:text-xl'>Danh sách bài tập</div>
+              <div className='italic text-sm sm:text-base md:text-lg lg:text-xl'>Problem List</div>
             </Link>
           </div>
         ) : (
           <Button className='hover:bg-gray-300 rounded-xl text-lg px-8 py-4 sm:px-8 sm:py-4 md:px-10 md:py-5 shadow bg-gray-200'>
             <Link to={googleAuthUrl} className='flex gap-3 sm:gap-5 items-center'>
               <img src={GoogleLogo} className='size-6' alt='Google Logo' />
-              <span className='text-sm sm:text-base md:text-lg'>Đăng nhập với Google</span>
+              <span className='text-sm sm:text-base md:text-lg'>Login with Google</span>
             </Link>
           </Button>
         )}

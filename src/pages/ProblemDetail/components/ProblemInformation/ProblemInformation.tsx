@@ -7,12 +7,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 const ProblemInformation = ({ problem }: { problem: Problem }) => {
   return (
     <div className='bg-gray-100 shadow rounded-xl p-6 border-2 mb-4 max-h-[400px] overflow-y-scroll'>
-      <div className='text-xl font-semibold mb-2'>Mô tả:</div>
+      <div className='text-xl font-semibold mb-2'>Description</div>
       <div
         className='text-gray-800 mb-4'
         dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(problem.description!) }}
       />
-      <div className='text-xl font-semibold mb-2'>Ví dụ:</div>
+      <div className='text-xl font-semibold mb-2'>Example</div>
       <Table className='border-collapse'>
         <TableHeader>
           <TableRow>

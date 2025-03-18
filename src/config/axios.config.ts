@@ -1,9 +1,15 @@
 import { envConfig } from '@/config/env.config'
 import { toast } from '@/hooks/use-toast'
 import { useAuthStore } from '@/store/useAuthStore'
+import { AccountResponse, ErrorResponse } from '@/types'
 import { logout } from '@/utils/auth'
-import { getAccessTokenFromLS, saveAccessTokenToLS, saveUserToLS } from '@/utils/local-storage'
-import axios, { AxiosInstance } from 'axios'
+import {
+  getAccessTokenFromLS,
+  saveAccessTokenToLS,
+  saveRemainingEmptyFeedbackSubmits,
+  saveUserToLS
+} from '@/utils/local-storage'
+import axios, { AxiosInstance, isAxiosError } from 'axios'
 
 class AxiosClient {
   instance: AxiosInstance
@@ -41,23 +47,37 @@ class AxiosClient {
     this.instance.interceptors.response.use(
       (response) => {
         if (response.config.url === '/api/v1/auth/login/google') {
-          const { access_token, user } = response.data.data ?? {}
+          const { access_token, user } = (response.data.data as AccountResponse) ?? {}
           this.accessToken = access_token
           saveAccessTokenToLS(access_token)
           saveUserToLS(user)
+          if (user.first_time_login) {
+            saveRemainingEmptyFeedbackSubmits(2)
+          }
           useAuthStore.setState({ isAuth: true, user: response.data.data.user })
         }
         return response
       },
       (error) => {
+        if (error.response.status === 403) {
+          if (isAxiosError<ErrorResponse>(error)) {
+            this.accessToken = ''
+            logout()
+            toast({
+              variant: 'destructive',
+              title: 'Error',
+              description: error?.response?.data.detail || 'You do not have permission to access to the system'
+            })
+          }
+        }
         // Invalid/Expired access token
         if (error.response.status === 401) {
           this.accessToken = ''
           logout()
           toast({
             variant: 'destructive',
-            title: 'Thông báo',
-            description: 'Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại'
+            title: 'Error',
+            description: 'Your session has expired. Please log in again'
           })
         }
       }

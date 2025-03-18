@@ -5,28 +5,14 @@ import { loginWithGoogle } from '@/utils/apis'
 import { toast } from '@/hooks/use-toast'
 import { Loader2 } from 'lucide-react'
 import { useMutation } from '@tanstack/react-query'
+import { isAxiosError } from '@/utils/error'
+import { ErrorResponse } from '@/types'
 
 export default function GoogleCallback() {
   const navigate = useNavigate()
 
   const loginWithGoogleMutation = useMutation({
-    mutationFn: loginWithGoogle,
-    onSuccess: () => {
-      toast({
-        variant: 'success',
-        title: 'Thành công',
-        description: 'Đăng nhập thành công'
-      })
-      navigate('/problems')
-    },
-    onError: () => {
-      toast({
-        variant: 'destructive',
-        title: 'Lỗi',
-        description: 'Có lỗi xảy ra trong quá trình đăng nhập. Vui lòng thử lại'
-      })
-      navigate('/')
-    }
+    mutationFn: loginWithGoogle
   })
 
   useEffect(() => {
@@ -37,12 +23,29 @@ export default function GoogleCallback() {
       if (!code) {
         toast({
           variant: 'destructive',
-          title: 'Lỗi',
-          description: 'Có lỗi xảy ra trong quá trình đăng nhập'
+          title: 'Error',
+          description: 'An error occurred while logging in. Please try again'
         })
         navigate('/')
       } else {
-        loginWithGoogleMutation.mutate(code)
+        try {
+          const response = await loginWithGoogleMutation.mutateAsync(code)
+          toast({
+            variant: 'success',
+            title: 'Success',
+            description: response.data.detail // Login successfully
+          })
+          navigate('/problems')
+        } catch (error) {
+          if (isAxiosError<ErrorResponse>(error)) {
+            toast({
+              variant: 'destructive',
+              title: 'Error',
+              description: error?.response?.data.detail || 'You do not have permission to access to the system'
+            })
+          }
+          navigate('/')
+        }
       }
     }
 
@@ -53,8 +56,8 @@ export default function GoogleCallback() {
     <div className='max-w-7xl mx-auto p-8'>
       <div className='min-h-screen flex flex-col items-center justify-center gap-8'>
         <Loader2 className='size-16 animate-spin' />
-        <div className='text-gray-700 font-medium text-xl md:text-2xl lg:text-3xl italic'>
-          Google đang xử lý yêu cầu của bạn. Xin vui lòng đợi...
+        <div className='text-gray-700 font-medium text-lg md:text-xl lg:text-2xl italic'>
+          Your request is processing. Please wait...
         </div>
       </div>
     </div>

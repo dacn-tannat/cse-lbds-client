@@ -2,25 +2,23 @@ import { create } from 'zustand'
 
 interface CodeState {
   codes: Record<number, string> // { problem_id: "..." }
-  setCode: (problemId: number, code: string) => void
-  getCode: (problemId: number) => string
-  saveToSessionStorage: () => void
+  setCodes: (problemId: number, code: string) => void
+  getProblemCode: (problemId: number) => string
+  saveCodes: () => void
 }
 
 const useCodeStore = create<CodeState>((set, get) => ({
   codes: JSON.parse(sessionStorage.getItem('student_code') || '{}'),
 
-  setCode: (problemId, code) => {
+  setCodes: (problemId, code) => {
     const updatedCodes = { ...get().codes, [problemId]: code }
     sessionStorage.setItem('student_code', JSON.stringify(updatedCodes))
     set({ codes: updatedCodes })
   },
 
-  getCode: (problemId) => get().codes[problemId] || '',
+  getProblemCode: (problemId) => get().codes[problemId] || '',
 
-  saveToSessionStorage: () => {
-    sessionStorage.setItem('student_code', JSON.stringify(get().codes))
-  }
+  saveCodes: () => sessionStorage.setItem('student_code', JSON.stringify(get().codes))
 }))
 
 export default useCodeStore

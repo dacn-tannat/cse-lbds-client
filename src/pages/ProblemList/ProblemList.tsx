@@ -17,7 +17,7 @@ const columns: ColumnDef<Problem>[] = [
   {
     id: 'name',
     accessorKey: 'name',
-    header: 'Tên'
+    header: 'Problem Name'
   }
 ]
 
@@ -63,7 +63,7 @@ export default function ProblemList() {
     <div className='bg-gray-50'>
       <div className='max-w-7xl mx-auto p-8 min-h-screen'>
         <div className='text-2xl lg:text-3xl font-semibold mb-8 text-center'>
-          Danh sách bài tập Thực hành Kỹ thuật lập trình - HK242
+          Programming Fundamentals Laboratory Exercises - Semester 242
         </div>
         {problemData && (
           <Accordion type='single' collapsible className='w-full'>

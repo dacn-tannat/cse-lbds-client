@@ -54,7 +54,7 @@ export default function ProblemDetail() {
     onError: (error) => {
       toast({
         variant: 'destructive',
-        title: 'Có lỗi xảy ra trong quá trình dự đoán',
+        title: 'An error occurred while predicting. Please try again',
         description: error.message
       })
       setIsPredicting(false)
