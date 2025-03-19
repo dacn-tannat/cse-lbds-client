@@ -1,9 +1,10 @@
 import { useLocation } from 'react-router-dom'
-import useAppRoutes from './hooks/use-app-routes'
+// import useAppRoutes from './hooks/use-app-routes'
 import { useEffect } from 'react'
 import { LogoutEventTarget } from './utils/auth'
 import { LOGOUT_EVENT } from './utils/constants'
 import { useAuthStore } from './store/useAuthStore'
+import Maintenance from './pages/Maintenance'
 
 const ScrollToTop = () => {
   const { pathname } = useLocation()
@@ -25,11 +26,12 @@ function App() {
     }
   }, [reset])
 
-  const appRoutes = useAppRoutes()
+  // const appRoutes = useAppRoutes()
   return (
     <>
       <ScrollToTop />
-      {appRoutes}
+      {/* {appRoutes} */}
+      <Maintenance />
     </>
   )
 }
