@@ -5,5 +5,6 @@ export const envConfig = {
   GOOGLE_REDIRECT_URI:
     import.meta.env.MODE === 'production'
       ? import.meta.env.VITE_GOOGLE_REDIRECT_URI_PRODUCTION
-      : import.meta.env.VITE_GOOGLE_REDIRECT_URI
+      : import.meta.env.VITE_GOOGLE_REDIRECT_URI,
+  MAINTENANCE: import.meta.env.VITE_MAINTENANCE
 }

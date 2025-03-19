@@ -1,9 +1,10 @@
 import { useLocation } from 'react-router-dom'
-// import useAppRoutes from './hooks/use-app-routes'
+import useAppRoutes from './hooks/use-app-routes'
 import { useEffect } from 'react'
 import { LogoutEventTarget } from './utils/auth'
 import { LOGOUT_EVENT } from './utils/constants'
 import { useAuthStore } from './store/useAuthStore'
+import { envConfig } from './config/env.config'
 import Maintenance from './pages/Maintenance'
 
 const ScrollToTop = () => {
@@ -26,12 +27,12 @@ function App() {
     }
   }, [reset])
 
-  // const appRoutes = useAppRoutes()
+  const routes = useAppRoutes()
+
   return (
     <>
       <ScrollToTop />
-      {/* {appRoutes} */}
-      <Maintenance />
+      {envConfig.MAINTENANCE === 'true' ? <Maintenance /> : routes}
     </>
   )
 }
