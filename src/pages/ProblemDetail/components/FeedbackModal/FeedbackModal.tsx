@@ -51,73 +51,28 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
     TOKEN_ERROR: [],
     SUGGESTION_USEFUL: []
   })
-  const [toggledBoth, setToggledBoth] = useState<number[]>([])
-  const [didNotUtilize, setDidNotUtilize] = useState(false)
+  // const [toggledBoth, setToggledBoth] = useState<number[]>([])
+  // const [didNotUtilize, setDidNotUtilize] = useState(false)
 
-  console.log(selectedCheckboxes, toggledBoth, didNotUtilize)
+  console.log(selectedCheckboxes)
 
-  const handleCheckboxChange = (bugId: number, column: BugCheckTypeValue, checked: boolean) => {
+  const handleCheckboxChange = (bugId: number, type: BugCheckTypeValue, checked: boolean) => {
     setSelectedCheckboxes((prev) => {
-      const updatedColumn = checked ? [...prev[column], bugId] : prev[column].filter((id) => id !== bugId)
+      const updatedCheckboxes = { ...prev }
 
-      const newState = { ...prev, [column]: updatedColumn }
-
-      /* Nếu có ít nhất một checkbox được tick -> Uncheck global */
       if (checked) {
-        setDidNotUtilize(false)
-      }
+        updatedCheckboxes[type] = [...prev[type], bugId]
 
-      /* Nếu cả hai checkbox trong hàng đều check -> tự check toggle cả hai */
-      if (newState.TOKEN_ERROR.includes(bugId) && newState.SUGGESTION_USEFUL.includes(bugId)) {
-        setToggledBoth((prev) => [...prev, bugId])
-      } else {
-        setToggledBoth((prev) => prev.filter((id) => id !== bugId))
-      }
-
-      return newState
-    })
-  }
-
-  const handleToggleBoth = (bugId: number) => {
-    setSelectedCheckboxes((prev) => {
-      const isTokenErrorChecked = prev.TOKEN_ERROR.includes(bugId)
-      const isSuggestionChecked = prev.SUGGESTION_USEFUL.includes(bugId)
-
-      let newTokenError = [...prev.TOKEN_ERROR]
-      let newSuggestionUseful = [...prev.SUGGESTION_USEFUL]
-
-      /* Nếu cả hai chưa được check, check cả hai */
-      if (!isTokenErrorChecked && !isSuggestionChecked) {
-        newTokenError.push(bugId)
-        newSuggestionUseful.push(bugId)
-        setToggledBoth((prev) => [...prev, bugId])
-        setDidNotUtilize(false) // Uncheck global checkbox khi có lựa chọn
-      } else if (isTokenErrorChecked && isSuggestionChecked) {
-        /* Nếu cả hai đã check, uncheck cả hai */
-        newTokenError = newTokenError.filter((id) => id !== bugId)
-        newSuggestionUseful = newSuggestionUseful.filter((id) => id !== bugId)
-        setToggledBoth((prev) => prev.filter((id) => id !== bugId))
-      } else {
-        /* Nếu một trong hai đã check, check nốt checkbox còn lại */
-        if (!isTokenErrorChecked) newTokenError.push(bugId)
-        if (!isSuggestionChecked) newSuggestionUseful.push(bugId)
-
-        // Đánh dấu toggle cả hai nếu sau khi cập nhật cả hai ô đều được chọn
-        if (newTokenError.includes(bugId) && newSuggestionUseful.includes(bugId)) {
-          setToggledBoth((prev) => [...prev, bugId])
+        // Nếu check vào "Position to review" thì tự động check "Suggestion" nếu chưa check
+        if (type === BUG_CHECK_TYPE.TOKEN_ERROR && !prev[BUG_CHECK_TYPE.SUGGESTION_USEFUL].includes(bugId)) {
+          updatedCheckboxes[BUG_CHECK_TYPE.SUGGESTION_USEFUL] = [...prev[BUG_CHECK_TYPE.SUGGESTION_USEFUL], bugId]
         }
+      } else {
+        updatedCheckboxes[type] = prev[type].filter((id) => id !== bugId)
       }
 
-      return { TOKEN_ERROR: newTokenError, SUGGESTION_USEFUL: newSuggestionUseful }
+      return updatedCheckboxes
     })
-  }
-
-  const handleDidNotUtilize = (checked: boolean) => {
-    setDidNotUtilize(checked)
-    if (checked) {
-      setSelectedCheckboxes({ TOKEN_ERROR: [], SUGGESTION_USEFUL: [] })
-      setToggledBoth([])
-    }
   }
 
   const restrictUserMutation = useMutation({
@@ -173,11 +128,9 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
   }
 
   const handleSubmitFeedback = () => {
-    const payloads: BugCheckRequest[] = []
-
     const { TOKEN_ERROR: checkedErrors, SUGGESTION_USEFUL: checkedSuggestions } = selectedCheckboxes
 
-    if (!didNotUtilize && checkedErrors.length === 0 && checkedSuggestions.length === 0) {
+    if (checkedErrors.length === 0 && checkedSuggestions.length === 0) {
       toast({
         variant: 'warning',
         title: 'Empty feedback',
@@ -187,8 +140,8 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
             your account will be <span className='font-semibold'>suspended</span> from website within{' '}
             <span className='font-semibold'>12 hours.</span>.
             <br />
-            If you didn't use any bug position or suggestion, please check{' '}
-            <span className='font-semibold'>"I did not utilize any bug position or suggestion"</span>
+            {/* If you didn't use any bug position or suggestion, please check{' '}
+            <span className='font-semibold'>"I did not utilize any bug position or suggestion"</span> */}
           </>
         ),
 
@@ -205,17 +158,23 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
         className: cn('w-[650px] bottom-0 right-0 fixed mr-4 mb-4')
       })
     } else {
-      payloads.push({
-        prediction_id: predictionId,
-        type: BUG_CHECK_TYPE.TOKEN_ERROR,
-        position: checkedErrors
-      })
+      const payloads: BugCheckRequest[] = []
 
-      payloads.push({
-        prediction_id: predictionId,
-        type: BUG_CHECK_TYPE.SUGGESTION_USEFUL,
-        position: checkedSuggestions
-      })
+      if (checkedErrors.length > 0) {
+        payloads.push({
+          prediction_id: predictionId,
+          type: BUG_CHECK_TYPE.TOKEN_ERROR,
+          position: checkedErrors
+        })
+      }
+
+      if (checkedSuggestions.length > 0) {
+        payloads.push({
+          prediction_id: predictionId,
+          type: BUG_CHECK_TYPE.SUGGESTION_USEFUL,
+          position: checkedSuggestions
+        })
+      }
 
       bugCheckMutation.mutate(payloads)
     }
@@ -275,7 +234,6 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
                     <TableHead className='border-2 border-gray-300 font-semibold bg-gray-200 text-center text-base'>
                       Suggestion <span className='text-yellow-700 text-sm'>**</span>
                     </TableHead>
-                    <TableHead className='w-[50px] border-2 border-gray-300 bg-gray-200'></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -331,30 +289,12 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
                           />
                         </div>
                       </TableCell>
-                      {/* Check/uncheck both */}
-                      <TableCell
-                        className={`text-center p-0 border-2 border-gray-300 ${index % 2 ? 'bg-white' : 'bg-gray-100'}`}
-                      >
-                        <Checkbox
-                          checked={toggledBoth.includes(bug.id)}
-                          onCheckedChange={() => handleToggleBoth(bug.id)}
-                        />
-                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
             </div>
             <div className='space-y-2'>
-              {/* Not utilize */}
-              <div className='flex items-center justify-start gap-2'>
-                <Checkbox
-                  checked={didNotUtilize}
-                  onCheckedChange={(checked) => handleDidNotUtilize(Boolean(checked))}
-                />
-
-                <span className='text-gray-700 font-medium'>I did not utilize any bug position or suggestion</span>
-              </div>
               <div className='text-red-600 italic text-sm'>
                 [*] Mark all the <span className='font-bold'>positions</span> you used to correct the errors
               </div>
