@@ -4,6 +4,7 @@ import { useAuthStore } from '@/store/useAuthStore'
 import { AccountResponse, ErrorResponse } from '@/types'
 import { logout } from '@/utils/auth'
 import {
+  clearPredictionFromLS,
   getAccessTokenFromLS,
   saveAccessTokenToLS,
   saveRemainingEmptyFeedbackSubmits,
@@ -52,7 +53,8 @@ class AxiosClient {
           saveAccessTokenToLS(access_token)
           saveUserToLS(user)
           if (user.first_time_login) {
-            saveRemainingEmptyFeedbackSubmits(2)
+            clearPredictionFromLS()
+            saveRemainingEmptyFeedbackSubmits(3)
           }
           useAuthStore.setState({ isAuth: true, user: response.data.data.user })
         }

@@ -42,14 +42,17 @@ export default function ProblemDetail() {
   const predictMutation = useMutation({
     mutationFn: predict,
     onSuccess: (response) => {
+      // only process response that has buggy_position
+      if (response.data.data.buggy_position.length > 0) {
+        setPrediction(response.data.data)
+        // save prediction into local storage
+        savePredictionToLS({
+          predictionId: response.data.data!.id,
+          sourceCode: submission!.source_code,
+          buggyPositions: response.data.data!.buggy_position
+        })
+      }
       setIsPredicting(false)
-      setPrediction(response.data.data)
-      // save prediction into local storage
-      savePredictionToLS({
-        predictionId: response.data.data!.id,
-        sourceCode: submission!.source_code,
-        buggyPositions: response.data.data!.buggy_position
-      })
     },
     onError: (error) => {
       toast({

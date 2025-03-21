@@ -7,7 +7,7 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog'
-import { memo, useRef } from 'react'
+import { memo, useRef, useState } from 'react'
 import DOMPurify from 'dompurify'
 import { BugCheckRequest, BugCheckTypeValue, PredictionLS } from '@/types'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -44,23 +44,79 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
   // close modal by clicking DialogClose button
   const closeButtonRef = useRef<HTMLButtonElement>(null)
 
-  const selectedCheckboxesRef = useRef<{
+  const [selectedCheckboxes, setSelectedCheckboxes] = useState<{
     TOKEN_ERROR: number[]
     SUGGESTION_USEFUL: number[]
   }>({
     TOKEN_ERROR: [],
     SUGGESTION_USEFUL: []
   })
+  const [toggledBoth, setToggledBoth] = useState<number[]>([])
+  const [didNotUtilize, setDidNotUtilize] = useState(false)
 
-  const handleDefaultChecked = (bugCheckType: BugCheckTypeValue, bugId: number) => {
-    return selectedCheckboxesRef.current[bugCheckType].includes(bugId)
-  }
+  console.log(selectedCheckboxes, toggledBoth, didNotUtilize)
 
   const handleCheckboxChange = (bugId: number, column: BugCheckTypeValue, checked: boolean) => {
+    setSelectedCheckboxes((prev) => {
+      const updatedColumn = checked ? [...prev[column], bugId] : prev[column].filter((id) => id !== bugId)
+
+      const newState = { ...prev, [column]: updatedColumn }
+
+      /* Nếu có ít nhất một checkbox được tick -> Uncheck global */
+      if (checked) {
+        setDidNotUtilize(false)
+      }
+
+      /* Nếu cả hai checkbox trong hàng đều check -> tự check toggle cả hai */
+      if (newState.TOKEN_ERROR.includes(bugId) && newState.SUGGESTION_USEFUL.includes(bugId)) {
+        setToggledBoth((prev) => [...prev, bugId])
+      } else {
+        setToggledBoth((prev) => prev.filter((id) => id !== bugId))
+      }
+
+      return newState
+    })
+  }
+
+  const handleToggleBoth = (bugId: number) => {
+    setSelectedCheckboxes((prev) => {
+      const isTokenErrorChecked = prev.TOKEN_ERROR.includes(bugId)
+      const isSuggestionChecked = prev.SUGGESTION_USEFUL.includes(bugId)
+
+      let newTokenError = [...prev.TOKEN_ERROR]
+      let newSuggestionUseful = [...prev.SUGGESTION_USEFUL]
+
+      /* Nếu cả hai chưa được check, check cả hai */
+      if (!isTokenErrorChecked && !isSuggestionChecked) {
+        newTokenError.push(bugId)
+        newSuggestionUseful.push(bugId)
+        setToggledBoth((prev) => [...prev, bugId])
+        setDidNotUtilize(false) // Uncheck global checkbox khi có lựa chọn
+      } else if (isTokenErrorChecked && isSuggestionChecked) {
+        /* Nếu cả hai đã check, uncheck cả hai */
+        newTokenError = newTokenError.filter((id) => id !== bugId)
+        newSuggestionUseful = newSuggestionUseful.filter((id) => id !== bugId)
+        setToggledBoth((prev) => prev.filter((id) => id !== bugId))
+      } else {
+        /* Nếu một trong hai đã check, check nốt checkbox còn lại */
+        if (!isTokenErrorChecked) newTokenError.push(bugId)
+        if (!isSuggestionChecked) newSuggestionUseful.push(bugId)
+
+        // Đánh dấu toggle cả hai nếu sau khi cập nhật cả hai ô đều được chọn
+        if (newTokenError.includes(bugId) && newSuggestionUseful.includes(bugId)) {
+          setToggledBoth((prev) => [...prev, bugId])
+        }
+      }
+
+      return { TOKEN_ERROR: newTokenError, SUGGESTION_USEFUL: newSuggestionUseful }
+    })
+  }
+
+  const handleDidNotUtilize = (checked: boolean) => {
+    setDidNotUtilize(checked)
     if (checked) {
-      selectedCheckboxesRef.current[column] = [...selectedCheckboxesRef.current[column], bugId]
-    } else {
-      selectedCheckboxesRef.current[column] = selectedCheckboxesRef.current[column].filter((_bugId) => _bugId !== bugId)
+      setSelectedCheckboxes({ TOKEN_ERROR: [], SUGGESTION_USEFUL: [] })
+      setToggledBoth([])
     }
   }
 
@@ -110,7 +166,7 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
       onSubmittedFeedback()
       toast({
         variant: 'success',
-        title: 'Noted empty feedback',
+        title: 'Feedback sent successfully',
         description: `You can only submit ${remainingSubmits - 1} more empty feedbacks. Be careful!`
       })
     }
@@ -119,34 +175,23 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
   const handleSubmitFeedback = () => {
     const payloads: BugCheckRequest[] = []
 
-    const submitFeedback = async () => {
-      if (checkedErrors.length > 0) {
-        payloads.push({
-          prediction_id: predictionId,
-          type: BUG_CHECK_TYPE.TOKEN_ERROR,
-          position: checkedErrors
-        })
-      }
+    const { TOKEN_ERROR: checkedErrors, SUGGESTION_USEFUL: checkedSuggestions } = selectedCheckboxes
 
-      if (checkedSuggestions.length > 0) {
-        payloads.push({
-          prediction_id: predictionId,
-          type: BUG_CHECK_TYPE.SUGGESTION_USEFUL,
-          position: checkedSuggestions
-        })
-      }
-
-      bugCheckMutation.mutate(payloads)
-    }
-
-    const { TOKEN_ERROR: checkedErrors, SUGGESTION_USEFUL: checkedSuggestions } = selectedCheckboxesRef.current
-
-    if (checkedErrors.length === 0 && checkedSuggestions.length === 0) {
+    if (!didNotUtilize && checkedErrors.length === 0 && checkedSuggestions.length === 0) {
       toast({
         variant: 'warning',
         title: 'Empty feedback',
-        description:
-          'We only allow users to submit empty feedback up to 3 times. After 3 times, your account will be suspended from all website activities within 12 hours.',
+        description: (
+          <>
+            We only allow to submit empty feedback up to <span className='font-semibold'>3 times</span>. After that,
+            your account will be <span className='font-semibold'>suspended</span> from website within{' '}
+            <span className='font-semibold'>12 hours.</span>.
+            <br />
+            If you didn't use any bug position or suggestion, please check{' '}
+            <span className='font-semibold'>"I did not utilize any bug position or suggestion"</span>
+          </>
+        ),
+
         action: (
           <ToastAction
             altText='Confirm'
@@ -157,10 +202,22 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
             Confirm
           </ToastAction>
         ),
-        className: cn('w-[520px] bottom-0 right-0 fixed mr-4 mb-4')
+        className: cn('w-[650px] bottom-0 right-0 fixed mr-4 mb-4')
       })
     } else {
-      submitFeedback()
+      payloads.push({
+        prediction_id: predictionId,
+        type: BUG_CHECK_TYPE.TOKEN_ERROR,
+        position: checkedErrors
+      })
+
+      payloads.push({
+        prediction_id: predictionId,
+        type: BUG_CHECK_TYPE.SUGGESTION_USEFUL,
+        position: checkedSuggestions
+      })
+
+      bugCheckMutation.mutate(payloads)
     }
   }
 
@@ -218,26 +275,31 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
                     <TableHead className='border-2 border-gray-300 font-semibold bg-gray-200 text-center text-base'>
                       Suggestion <span className='text-yellow-700 text-sm'>**</span>
                     </TableHead>
+                    <TableHead className='w-[50px] border-2 border-gray-300 bg-gray-200'></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {buggyPositions.map((bug, index) => (
                     <TableRow key={bug.id}>
+                      {/* # */}
                       <TableCell
                         className={`border-2 border-gray-300 text-center ${index % 2 ? 'bg-white' : 'bg-gray-100'}`}
                       >
                         {bug.id}
                       </TableCell>
+                      {/* Line */}
                       <TableCell
                         className={`border-2 border-gray-300 text-center ${index % 2 ? 'bg-white' : 'bg-gray-100'}`}
                       >
                         {bug.line_number}
                       </TableCell>
+                      {/* Column */}
                       <TableCell
                         className={`border-2 border-gray-300 text-center ${index % 2 ? 'bg-white' : 'bg-gray-100'}`}
                       >
                         {bug.col_number}
                       </TableCell>
+                      {/* Position to review */}
                       <TableCell
                         className={`border-2 border-gray-300 text-center font-mono ${
                           index % 2 ? 'bg-white' : 'bg-gray-100'
@@ -246,13 +308,14 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
                         <div className='flex flex-row justify-center items-center gap-4 mx-2'>
                           {bug.original_token}
                           <Checkbox
-                            defaultChecked={handleDefaultChecked(BUG_CHECK_TYPE.TOKEN_ERROR, bug.id)}
+                            checked={selectedCheckboxes.TOKEN_ERROR.includes(bug.id)}
                             onCheckedChange={(checked) =>
                               handleCheckboxChange(bug.id, BUG_CHECK_TYPE.TOKEN_ERROR, Boolean(checked))
                             }
                           />
                         </div>
                       </TableCell>
+                      {/* Suggestion */}
                       <TableCell
                         className={`border-2 border-gray-300 text-center font-mono ${
                           index % 2 ? 'bg-white' : 'bg-gray-100'
@@ -261,12 +324,21 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
                         <div className='flex flex-row justify-center items-center gap-4 mx-2'>
                           {bug.predicted_token}
                           <Checkbox
-                            defaultChecked={handleDefaultChecked(BUG_CHECK_TYPE.SUGGESTION_USEFUL, bug.id)}
+                            checked={selectedCheckboxes.SUGGESTION_USEFUL.includes(bug.id)}
                             onCheckedChange={(checked) =>
                               handleCheckboxChange(bug.id, BUG_CHECK_TYPE.SUGGESTION_USEFUL, Boolean(checked))
                             }
                           />
                         </div>
+                      </TableCell>
+                      {/* Check/uncheck both */}
+                      <TableCell
+                        className={`text-center p-0 border-2 border-gray-300 ${index % 2 ? 'bg-white' : 'bg-gray-100'}`}
+                      >
+                        <Checkbox
+                          checked={toggledBoth.includes(bug.id)}
+                          onCheckedChange={() => handleToggleBoth(bug.id)}
+                        />
                       </TableCell>
                     </TableRow>
                   ))}
@@ -274,8 +346,17 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
               </Table>
             </div>
             <div className='space-y-2'>
+              {/* Not utilize */}
+              <div className='flex items-center justify-start gap-2'>
+                <Checkbox
+                  checked={didNotUtilize}
+                  onCheckedChange={(checked) => handleDidNotUtilize(Boolean(checked))}
+                />
+
+                <span className='text-gray-700 font-medium'>I did not utilize any bug position or suggestion</span>
+              </div>
               <div className='text-red-600 italic text-sm'>
-                [*] Mark all the <span className='font-bold'>positions</span> you used to correct the errors.
+                [*] Mark all the <span className='font-bold'>positions</span> you used to correct the errors
               </div>
               <div className='text-yellow-700 italic text-sm'>
                 [**] Mark all the <span className='font-bold'>suggestions</span> you used to correct the errors

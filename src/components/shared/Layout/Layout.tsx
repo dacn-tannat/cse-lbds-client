@@ -4,15 +4,10 @@ import Footer from '@/components/shared/Footer'
 import { Outlet } from 'react-router-dom'
 import { memo } from 'react'
 
-interface LayoutProps {
-  children?: React.ReactNode
-}
-
-function Layout({ children }: LayoutProps) {
+function Layout() {
   return (
     <>
       <Header />
-      {children}
       <Outlet />
       <Toaster />
       <Footer />
