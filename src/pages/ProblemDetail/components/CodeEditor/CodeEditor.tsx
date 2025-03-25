@@ -19,9 +19,10 @@ import { useLocation } from 'react-router-dom'
 
 interface CodeEditorProps {
   problem_id: number
+  sample_code: string | null
 }
 
-const CodeEditor = ({ problem_id }: CodeEditorProps) => {
+const CodeEditor = ({ problem_id, sample_code }: CodeEditorProps) => {
   // Current URL
   const location = useLocation()
 
@@ -30,7 +31,7 @@ const CodeEditor = ({ problem_id }: CodeEditorProps) => {
   const [theme, setTheme] = useState<keyof typeof EDITOR_THEME>(EDITOR_THEME.DARK)
 
   // This ref to saved source code typed from user or loaded from session storage
-  const editorContentRef = useRef<string>('')
+  const editorContentRef = useRef<string>(sample_code ?? '')
 
   //! [UNSTABLE] Last prediction:
   const lastPrediction = getPredictionFromLS()
@@ -106,8 +107,12 @@ const CodeEditor = ({ problem_id }: CodeEditorProps) => {
 
   // Save code into session storage and zustand when
   useEffect(() => {
-    editorContentRef.current = code
-  }, [problem_id, code])
+    // Update ref if it's the first load or problem_id changes
+    const storedCode = code || sample_code || ''
+    if (editorContentRef.current !== storedCode) {
+      editorContentRef.current = storedCode
+    }
+  }, [problem_id, sample_code, code])
 
   useEffect(() => {
     const handleSave = () => {
@@ -157,7 +162,7 @@ const CodeEditor = ({ problem_id }: CodeEditorProps) => {
           <Editor
             height='350px'
             language='cpp'
-            value={code || editorContentRef.current}
+            defaultValue={editorContentRef.current}
             onChange={handleEditorChange}
             theme={`vs-${theme.toLowerCase()}`} // vs-dark, vs-light
             options={{

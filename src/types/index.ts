@@ -52,6 +52,7 @@ export interface Problem {
   description?: string
   examples?: TestCase[]
   constrain?: string[]
+  sample_code: string | null
 }
 
 /**

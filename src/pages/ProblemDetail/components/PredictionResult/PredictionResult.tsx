@@ -53,16 +53,12 @@ const PredictionResult = ({ buggyPositions, source_code }: PredictionResultProps
                     {bug.id}
                   </TableCell>
                   <TableCell
-                    className={`border-2 border-gray-300 text-center whitespace-pre-wrap ${
-                      index % 2 ? 'bg-white' : 'bg-gray-100'
-                    }`}
+                    className={`border-2 border-gray-300 text-center ${index % 2 ? 'bg-white' : 'bg-gray-100'}`}
                   >
                     {bug.line_number}
                   </TableCell>
                   <TableCell
-                    className={`border-2 border-gray-300 text-center whitespace-pre-wrap ${
-                      index % 2 ? 'bg-white' : 'bg-gray-100'
-                    }`}
+                    className={`border-2 border-gray-300 text-center ${index % 2 ? 'bg-white' : 'bg-gray-100'}`}
                   >
                     {bug.col_number}
                   </TableCell>

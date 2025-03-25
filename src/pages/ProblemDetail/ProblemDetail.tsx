@@ -90,7 +90,7 @@ export default function ProblemDetail() {
           <div>
             <div className='text-2xl font-bold mb-6'>{`[${problem.lab_id}_${problem.category}] ${problem.name}`}</div>
             <ProblemInformation problem={problem} />
-            <CodeEditor problem_id={problem.id} />
+            <CodeEditor problem_id={problem.id} sample_code={problem.sample_code} />
             {submission &&
               (submission.message !== SUBMISSION_MESSAGE.ACCEPTED_RESPONSE ? (
                 <Suspense>
