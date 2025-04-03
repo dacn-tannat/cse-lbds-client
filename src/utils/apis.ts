@@ -30,7 +30,7 @@ export const getActiveProblems = () => {
 }
 
 export const getProblemById = (id: string) => {
-  return axiosInstance.get<ApiResponse<Problem>>(`/api/v1/problems/${id}`)
+  return axiosInstance.get<ApiResponse<Problem>>(`/api/v1/problems/active/${id}`)
 }
 
 /**

@@ -60,8 +60,8 @@ export default function ProblemList() {
   }
 
   return (
-    <div className='bg-gray-50'>
-      <div className='max-w-7xl mx-auto p-8 min-h-screen'>
+    <div className='bg-gray-50 h-full'>
+      <div className='max-w-7xl mx-auto p-8'>
         <div className='text-2xl lg:text-3xl font-semibold mb-8 text-center'>
           Programming Fundamentals Laboratory Exercises - Semester 242
         </div>

@@ -34,7 +34,8 @@ export default function ProblemDetail() {
     queryKey: ['problems', id],
     queryFn: ({ queryKey }) => getProblemById(queryKey[1]),
     enabled: Boolean(id),
-    staleTime: Infinity
+    staleTime: Infinity,
+    retry: 0
   })
 
   const problem = problemData?.data.data
@@ -84,8 +85,8 @@ export default function ProblemDetail() {
   if (isError) return <NotFound />
 
   return (
-    <div className='bg-gray-50'>
-      <div className='max-w-7xl min-h-screen mx-auto p-8'>
+    <div className='bg-gray-50 h-full'>
+      <div className='max-w-7xl mx-auto p-8'>
         {problem && (
           <div>
             <div className='text-2xl font-bold mb-6'>{`[${problem.lab_id}_${problem.category}] ${problem.name}`}</div>

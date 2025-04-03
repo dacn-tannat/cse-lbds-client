@@ -14,8 +14,8 @@ export default function HomePage() {
   const googleAuthUrl = generateGoogleAuthUrl()
 
   return (
-    <div className='bg-gray-50'>
-      <div className='text-gray-900 max-w-7xl min-h-screen mx-auto p-8 flex flex-col items-center justify-center text-center'>
+    <div className='bg-gray-50 h-full flex flex-col items-center justify-center'>
+      <div className='text-gray-900 max-w-7xl mx-auto p-8 flex flex-col items-center justify-center text-center'>
         {/* <div className='text-4xl sm:text-4xl md:text-5xl lg:text-6xl mb-4 sm:mb-6 md:mb-8 font-extrabold tracking-[0.05rem] md:tracking-[0.075rem] lg:tracking-[0.1rem]'>
           Welcome to CSE-LBDS
         </div> */}

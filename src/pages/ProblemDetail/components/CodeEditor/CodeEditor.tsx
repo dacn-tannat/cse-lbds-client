@@ -30,9 +30,6 @@ const CodeEditor = ({ problem_id, sample_code }: CodeEditorProps) => {
   const [fontSize, setFontSize] = useState<number>(FONT_SIZE.DEFAULT)
   const [theme, setTheme] = useState<keyof typeof EDITOR_THEME>(EDITOR_THEME.DARK)
 
-  // This ref to saved source code typed from user or loaded from session storage
-  const editorContentRef = useRef<string>(sample_code ?? '')
-
   //! [UNSTABLE] Last prediction:
   const lastPrediction = getPredictionFromLS()
   const hasSubmittedFeedback = !Boolean(lastPrediction)
@@ -50,6 +47,9 @@ const CodeEditor = ({ problem_id, sample_code }: CodeEditorProps) => {
   const code = useCodeStore((state) => state.getProblemCode(problem_id))
   const setCodes = useCodeStore((state) => state.setCodes)
   const saveCodes = useCodeStore((state) => state.saveCodes)
+
+  // This ref to saved source code typed from user or loaded from session storage
+  const editorContentRef = useRef<string>(code || sample_code || '')
 
   /* ----------------- HANDLER ----------------- */
 
@@ -104,15 +104,6 @@ const CodeEditor = ({ problem_id, sample_code }: CodeEditorProps) => {
     setIsSubmitting(true)
     submitMutation.mutate(payload)
   }
-
-  // Save code into session storage and zustand when
-  useEffect(() => {
-    // Update ref if it's the first load or problem_id changes
-    const storedCode = code || sample_code || ''
-    if (editorContentRef.current !== storedCode) {
-      editorContentRef.current = storedCode
-    }
-  }, [problem_id, sample_code, code])
 
   useEffect(() => {
     const handleSave = () => {

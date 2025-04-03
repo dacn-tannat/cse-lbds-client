@@ -6,12 +6,14 @@ import { memo } from 'react'
 
 function Layout() {
   return (
-    <>
+    <div className='flex flex-col h-screen'>
       <Header />
-      <Outlet />
+      <main className='flex-grow'>
+        <Outlet />
+      </main>
       <Toaster />
       <Footer />
-    </>
+    </div>
   )
 }
 
