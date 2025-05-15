@@ -10,8 +10,8 @@ interface ErrorMessageProps {
 
 const ErrorMessage = ({ message, status }: ErrorMessageProps) => {
   return (
-    <Alert className='mt-6 border-[1px] border-red-600 text-red-600 bg-red-100 rounded-xl'>
-      <AlertCircle className='h-4 w-4' />
+    <Alert data-testid="error-container" className='mt-6 border-[1px] border-red-600 text-red-600 bg-red-100 rounded-xl'>
+      <AlertCircle data-testid="error-icon" className='h-4 w-4' />
       <AlertTitle className='text-lg'>{STATUS_TITLE_MAPPING[status]}</AlertTitle>
       <AlertDescription>
         <pre className='whitespace-pre-wrap'>{message}</pre>

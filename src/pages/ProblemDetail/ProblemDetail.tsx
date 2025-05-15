@@ -86,7 +86,7 @@ export default function ProblemDetail() {
 
   return (
     <div className='bg-gray-50 h-full'>
-      <div className='max-w-7xl mx-auto p-8'>
+      <div className='max-w-7xl mx-auto p-8' role='main'>
         {problem && (
           <div>
             <div className='text-2xl font-bold mb-6'>{`[${problem.lab_id}_${problem.category}] ${problem.name}`}</div>

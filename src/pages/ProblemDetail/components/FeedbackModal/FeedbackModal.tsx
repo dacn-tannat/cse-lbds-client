@@ -295,10 +295,10 @@ const FeedbackModal = ({ lastPrediction, onSubmittedFeedback }: FeedbackModalPro
               </Table>
             </div>
             <div className='space-y-2'>
-              <div className='text-red-600 italic text-sm'>
+              <div className='text-red-600 italic text-sm' data-testid="position-note">
                 [*] Mark all the <span className='font-bold'>positions</span> you used to correct the errors
               </div>
-              <div className='text-yellow-700 italic text-sm'>
+              <div className='text-yellow-700 italic text-sm' data-testid="suggestion-note">
                 [**] Mark all the <span className='font-bold'>suggestions</span> you used to correct the errors
               </div>
               <div className='flex flex-wrap justify-end items-center gap-2'>

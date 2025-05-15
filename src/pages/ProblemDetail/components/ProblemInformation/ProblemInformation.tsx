@@ -10,7 +10,7 @@ const ProblemInformation = ({ problem }: { problem: Problem }) => {
       <div className='text-xl font-semibold mb-2'>Description</div>
       <div
         className='text-gray-800 mb-4'
-        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(problem.description!) }}
+        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(problem.description || '') }}
       />
       <div className='text-xl font-semibold mb-2'>Example</div>
       <Table className='border-collapse'>
@@ -21,26 +21,24 @@ const ProblemInformation = ({ problem }: { problem: Problem }) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {problem.examples!.map((example, index) => {
-            return (
-              <TableRow key={index}>
-                <TableCell
-                  className={`${
-                    index % 2 ? 'bg-white' : ''
-                  } border-2 border-gray-300 font-mono whitespace-pre-wrap text-left align-top`}
-                >
-                  {example.input || example.testcode}
-                </TableCell>
-                <TableCell
-                  className={`${
-                    index % 2 ? 'bg-white' : ''
-                  } border-2 border-gray-300 font-mono whitespace-pre-wrap text-left align-top`}
-                >
-                  {example.output}
-                </TableCell>
-              </TableRow>
-            )
-          })}
+          {problem.examples?.map((example, index) => (
+            <TableRow key={index}>
+              <TableCell
+                className={`${
+                  index % 2 ? 'bg-white' : ''
+                } border-2 border-gray-300 font-mono whitespace-pre-wrap text-left align-top`}
+              >
+                {example.input || example.testcode}
+              </TableCell>
+              <TableCell
+                className={`${
+                  index % 2 ? 'bg-white' : ''
+                } border-2 border-gray-300 font-mono whitespace-pre-wrap text-left align-top`}
+              >
+                {example.output}
+              </TableCell>
+            </TableRow>
+          ))}
         </TableBody>
       </Table>
     </div>

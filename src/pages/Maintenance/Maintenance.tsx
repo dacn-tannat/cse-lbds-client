@@ -2,11 +2,11 @@ import { AlertTriangle } from 'lucide-react'
 
 export default function Maintenance() {
   return (
-    <div className='flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4 text-center'>
+    <div className='flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4 text-center' role='main'>
       <div className='mx-auto max-w-7xl space-y-6'>
         <div className='flex justify-center'>
-          <div className='rounded-full bg-amber-100 p-3'>
-            <AlertTriangle className='h-12 w-12 text-amber-600' />
+          <div className='rounded-full bg-amber-100 p-3' data-testid='icon-container'>
+            <AlertTriangle className='h-12 w-12 text-amber-600' data-testid='alert-triangle-icon' />
           </div>
         </div>
 

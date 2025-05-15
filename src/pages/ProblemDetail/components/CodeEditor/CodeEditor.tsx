@@ -129,7 +129,7 @@ const CodeEditor = ({ problem_id, sample_code }: CodeEditorProps) => {
           <Badge className='text-black bg-gray-200 border-lg rounded-xl py-2 px-4 font-semibold text-sm'>C++</Badge>
           <div className='flex flex-row items-center gap-2 sm:gap-4 w-full sm:w-auto'>
             <div>
-              <Button className='border-2 p-5 rounded-xl' variant='ghost' size='icon' onClick={toggleTheme}>
+              <Button className='border-2 p-5 rounded-xl' variant='ghost' size='icon' onClick={toggleTheme} aria-label="Toggle theme">
                 {theme === EDITOR_THEME.LIGHT ? <Sun /> : <Moon />}
               </Button>
             </div>
