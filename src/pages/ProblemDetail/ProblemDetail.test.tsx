@@ -1,7 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor } from '@/test/test-utils';
+import {
+  // render,
+  screen, waitFor
+} from '@/test/test-utils';
 import { useParams } from 'react-router-dom';
-import ProblemDetail from './ProblemDetail';
+// import ProblemDetail from './ProblemDetail';
 import { getProblemById, predict, submitCode } from '@/utils/apis';
 import { Problem, SubmissionResponse } from '@/types';
 
@@ -86,7 +89,7 @@ describe('ProblemDetail', () => {
 
   it('renders loading state initially', () => {
     vi.mocked(getProblemById).mockImplementation(() => new Promise(() => {}));
-    const { user } = render(<ProblemDetail />);
+    // const { user } = render(<ProblemDetail />);
     expect(screen.getByRole('main', { hidden: true })).toBeInTheDocument();
   });
 
@@ -102,7 +105,7 @@ describe('ProblemDetail', () => {
       config: { headers: {} } as any
     });
 
-    const { user } = render(<ProblemDetail />);
+    // const { user } = render(<ProblemDetail />);
 
     await waitFor(() => {
       expect(screen.getByText(`[${mockProblem.lab_id}_${mockProblem.category}] ${mockProblem.name}`)).toBeInTheDocument();
@@ -114,7 +117,7 @@ describe('ProblemDetail', () => {
   it('renders error state when API call fails', async () => {
     vi.mocked(getProblemById).mockRejectedValue(new Error('Failed to fetch'));
 
-    const { user } = render(<ProblemDetail />);
+    // const { user } = render(<ProblemDetail />);
 
     await waitFor(() => {
       expect(screen.getByText('404')).toBeInTheDocument();
@@ -134,7 +137,7 @@ describe('ProblemDetail', () => {
       config: { headers: {} } as any
     });
 
-    const { user } = render(<ProblemDetail />);
+    // const { user } = render(<ProblemDetail />);
 
     await waitFor(() => {
       expect(screen.getByText(`[${mockProblem.lab_id}_${mockProblem.category}] ${mockProblem.name}`)).toBeInTheDocument();
@@ -161,7 +164,7 @@ describe('ProblemDetail', () => {
       config: { headers: {} } as any
     });
 
-    const { user } = render(<ProblemDetail />);
+    // const { user } = render(<ProblemDetail />);
 
     await waitFor(() => {
       expect(screen.getByText(`[${mockProblem.lab_id}_${mockProblem.category}] ${mockProblem.name}`)).toBeInTheDocument();

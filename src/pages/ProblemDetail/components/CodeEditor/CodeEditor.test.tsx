@@ -1,14 +1,23 @@
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
+import {
+  render, screen, fireEvent, waitFor,
+  // act 
+} from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { BrowserRouter, useLocation } from 'react-router-dom'
+import {
+  BrowserRouter,
+  // useLocation
+} from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Editor } from '@monaco-editor/react'
 import { toast } from '@/hooks/use-toast'
 import { submitCode } from '@/utils/apis'
-import { EDITOR_THEME, FONT_SIZE } from '@/utils/constants'
+import { 
+  // EDITOR_THEME,
+  FONT_SIZE
+} from '@/utils/constants'
 import CodeEditor from './CodeEditor'
-import React from 'react'
-import userEvent from '@testing-library/user-event'
+// import React from 'react'
+// import userEvent from '@testing-library/user-event'
 
 // Mock @monaco-editor/react
 vi.mock('@monaco-editor/react', () => ({

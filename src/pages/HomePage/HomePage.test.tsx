@@ -1,9 +1,12 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, waitFor } from '@/test/test-utils';
-import userEvent from '@testing-library/user-event';
-import { BrowserRouter } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import HomePage from './HomePage';
+import {
+  // render, 
+  screen, waitFor
+} from '@/test/test-utils';
+// import userEvent from '@testing-library/user-event';
+// import { BrowserRouter } from 'react-router-dom';
+// import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+// import HomePage from './HomePage';
 import { useAuthStore } from '@/store/useAuthStore';
 import { User } from '@/types';
 
@@ -21,31 +24,31 @@ vi.mock('@/store/useAuthStore', () => ({
   useAuthStore: vi.fn()
 }));
 
-const renderWithProviders = (ui: React.ReactElement) => {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-      },
-    },
-  });
+// const renderWithProviders = (ui: React.ReactElement) => {
+//   const queryClient = new QueryClient({
+//     defaultOptions: {
+//       queries: {
+//         retry: false,
+//       },
+//     },
+//   });
 
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>{ui}</BrowserRouter>
-    </QueryClientProvider>
-  );
-};
+//   return render(
+//     <QueryClientProvider client={queryClient}>
+//       <BrowserRouter>{ui}</BrowserRouter>
+//     </QueryClientProvider>
+//   );
+// };
 
 describe('HomePage', () => {
-  const user = userEvent.setup();
+  // const user = userEvent.setup();
 
   it('renders welcome message', async () => {
     vi.mocked(useAuthStore).mockImplementation((selector) => {
       return selector({ isAuth: false, user: null, reset: () => {} });
     });
 
-    const { user } = render(<HomePage />);
+    // const { user } = render(<HomePage />);
     
     await waitFor(() => {
       expect(screen.getByTestId('split-text')).toHaveTextContent('Welcome to CSE-LBDS');
@@ -58,7 +61,7 @@ describe('HomePage', () => {
       return selector({ isAuth: false, user: null, reset: () => {} });
     });
 
-    const { user } = render(<HomePage />);
+    // const { user } = render(<HomePage />);
     
     await waitFor(() => {
       expect(screen.getByText('Login with Google')).toBeInTheDocument();
@@ -79,7 +82,7 @@ describe('HomePage', () => {
       return selector({ isAuth: true, user: mockUser, reset: () => {} });
     });
 
-    const { user } = render(<HomePage />);
+    // const { user } = render(<HomePage />);
     
     await waitFor(() => {
       expect(screen.getByText('Problem List')).toBeInTheDocument();

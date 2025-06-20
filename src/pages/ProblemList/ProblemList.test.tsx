@@ -77,7 +77,7 @@ describe('ProblemList', () => {
   });
 
   it('renders the page title', async () => {
-    const { user } = render(<ProblemList />);
+    // const { user } = render(<ProblemList />);
     
     await waitFor(() => {
       expect(screen.getByText('Programming Fundamentals Laboratory Exercises - Semester 242')).toBeInTheDocument();

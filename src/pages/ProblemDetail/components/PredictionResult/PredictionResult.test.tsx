@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import PredictionResult from './PredictionResult'
 import { BuggyPosition } from '@/types'
-import DOMPurify from 'dompurify'
+// import DOMPurify from 'dompurify'
 
 describe('PredictionResult', () => {
   const mockSourceCode = `function add(a, b) {

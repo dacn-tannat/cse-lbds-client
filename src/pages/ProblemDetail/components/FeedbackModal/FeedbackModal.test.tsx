@@ -6,6 +6,7 @@ import * as APIs from '@/utils/apis'
 import { vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from '@/components/ui/toaster'
+import { PredictionLS } from '@/types'
 
 // Create a new QueryClient instance for testing
 const queryClient = new QueryClient({
@@ -119,6 +120,7 @@ describe('FeedbackModal', () => {
     
     // Find the pre element containing the source code
     const sourceCodeContainer = screen.getByText((content, element) => {
+      console.log(content)
       const isPreElement = element?.tagName.toLowerCase() === 'pre'
       const hasText = (text: string) => element?.textContent?.includes(text) ?? false
       return isPreElement && hasText('const x') && hasText('const y') && hasText('console.log')
